@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RxCore & KCS — Short Presentation</title>
+<title>RxCore — Industrial AI Platform</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,11 +19,7 @@
     overflow: hidden;
   }
 
-  .deck {
-    width: 1280px;
-    max-width: 100%;
-    position: relative;
-  }
+  .deck { width: 1280px; max-width: 100%; }
 
   .slide {
     width: 100%;
@@ -34,7 +30,6 @@
     box-shadow: 0 32px 80px rgba(0,0,0,0.6);
     display: none;
   }
-
   .slide.active { display: block; }
 
   .header {
@@ -42,659 +37,410 @@
     border-bottom: 1px solid #2a3042;
     background: linear-gradient(135deg, #161b27 0%, #1c2438 100%);
   }
-
-  .header-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-  }
-
-  .title-block h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1.2;
-    letter-spacing: -0.5px;
-  }
-
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  .title-block h1 { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.5px; }
   .title-block h1 span { color: #4f9cf9; }
+  .title-block .subtitle { margin-top: 8px; font-size: 14px; color: #8892a4; line-height: 1.6; max-width: 740px; }
+  .slide-tag { font-size: 11px; color: #4a576e; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; padding-top: 6px; }
 
-  .title-block .subtitle {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #8892a4;
-    font-weight: 400;
-    line-height: 1.5;
-    max-width: 720px;
+  .body { padding: 28px 48px 36px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+  .card {
+    background: #1c2235; border: 1px solid #252f44;
+    border-radius: 12px; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
   }
+  .card.wide { grid-column: span 2; }
+  .card.wide .items { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 20px; }
+  .card.full { grid-column: span 3; }
+  .card.full .items { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px 24px; }
 
-  .slide-tag {
-    font-size: 11px;
-    color: #4a576e;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    padding-top: 6px;
-  }
+  .card-head { display: flex; align-items: center; gap: 10px; }
+  .card-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .ib { background: #1a3a6b; } .ip { background: #2d1b4e; } .ig { background: #0e3a28; }
+  .ia { background: #3a2a0a; } .it { background: #0a2e32; } .io { background: #3a1e0a; }
+  .ir { background: #3a1a1a; } .ii { background: #1a1a4e; } .il { background: #1a3a0a; }
+  .iro { background: #3a0a1e; }
 
-  .body {
-    padding: 28px 48px 36px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 18px;
-  }
+  .card-title { font-size: 13px; font-weight: 700; color: #c5cde0; line-height: 1.3; }
+  .card-label { font-size: 10px; color: #4f9cf9; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-top: 2px; }
 
-  .pillar {
-    background: #1c2235;
-    border: 1px solid #252f44;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .pillar-header { display: flex; align-items: center; gap: 10px; }
-
-  .pillar-icon {
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .icon-blue   { background: #1a3a6b; }
-  .icon-purple { background: #2d1b4e; }
-  .icon-green  { background: #0e3a28; }
-  .icon-amber  { background: #3a2a0a; }
-  .icon-red    { background: #3a1a1a; }
-  .icon-teal   { background: #0a2e32; }
-  .icon-orange { background: #3a1e0a; }
-  .icon-rose   { background: #3a0a1e; }
-  .icon-indigo { background: #1a1a4e; }
-  .icon-lime   { background: #1a3a0a; }
-
-  .pillar-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #c5cde0;
-    line-height: 1.3;
-    letter-spacing: 0.2px;
-  }
-
-  .pillar-tag {
-    font-size: 10px;
-    color: #4f9cf9;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 600;
-    margin-top: 1px;
-  }
-
-  .pillar-items { display: flex; flex-direction: column; gap: 7px; }
+  .items { display: flex; flex-direction: column; gap: 8px; }
   .item { display: flex; align-items: flex-start; gap: 8px; }
-  .item-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 6px;
-  }
+  .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .db { background: #4f9cf9; } .dp { background: #a78bfa; } .dg { background: #34d399; }
+  .da { background: #fbbf24; } .dt { background: #2dd4bf; } .do { background: #fb923c; }
+  .dr { background: #f87171; } .di { background: #818cf8; } .dl { background: #a3e635; }
+  .dro { background: #fb7185; }
 
-  .dot-blue   { background: #4f9cf9; }
-  .dot-purple { background: #a78bfa; }
-  .dot-green  { background: #34d399; }
-  .dot-amber  { background: #fbbf24; }
-  .dot-red    { background: #f87171; }
-  .dot-teal   { background: #2dd4bf; }
-  .dot-orange { background: #fb923c; }
-  .dot-rose   { background: #fb7185; }
-  .dot-indigo { background: #818cf8; }
-  .dot-lime   { background: #a3e635; }
-
-  .item-text { font-size: 12px; color: #9aa5bc; line-height: 1.5; }
+  .item-text { font-size: 12px; color: #9aa5bc; line-height: 1.55; }
   .item-text strong { color: #c5cde0; font-weight: 600; }
 
-  .pillar.wide { grid-column: span 2; }
-  .wide .pillar-items { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 20px; }
-  .pillar.full { grid-column: span 3; }
-  .full .pillar-items { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px 24px; }
-
-  .stack { padding: 20px 48px 36px; display: flex; flex-direction: column; gap: 10px; }
-
-  .stack-layer {
-    background: #1c2235;
-    border: 1px solid #252f44;
-    border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .stack-layer.core { border-color: #4f9cf9; background: linear-gradient(90deg, #1c2235 0%, #1f2d4a 100%); }
-  .stack-layer.grounding { border-color: #a78bfa; background: linear-gradient(90deg, #1c2235 0%, #2a1f4a 100%); }
-
-  .stack-label {
-    font-size: 11px;
-    color: #4f9cf9;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    min-width: 180px;
-  }
-  .stack-layer.grounding .stack-label { color: #a78bfa; }
-
-  .stack-desc { font-size: 13px; color: #9aa5bc; line-height: 1.5; }
-  .stack-desc strong { color: #e8eaf0; }
-
-  .pipeline {
-    padding: 20px 48px;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr;
-    gap: 12px;
-    align-items: stretch;
-  }
-  .pipe-box {
-    background: #1c2235;
-    border: 1px solid #252f44;
-    border-radius: 12px;
-    padding: 16px;
-  }
-  .pipe-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: #c5cde0;
-    margin-bottom: 8px;
-    letter-spacing: 0.3px;
-  }
-  .pipe-tag {
-    font-size: 9px;
-    color: #4f9cf9;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .pipe-list { font-size: 11px; color: #9aa5bc; line-height: 1.6; }
-  .arrow {
-    display: flex;
-    align-items: center;
-    color: #4f9cf9;
-    font-size: 20px;
-    font-weight: 700;
-  }
-
-  .footer {
-    padding: 16px 48px;
-    border-top: 1px solid #2a3042;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
-
-  .footer-label {
-    font-size: 11px;
-    color: #4a576e;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    white-space: nowrap;
-  }
-
-  .footer-logo {
-    font-size: 13px;
-    font-weight: 700;
-    color: #4f9cf9;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-
-  .slide-counter {
-    font-size: 11px;
-    color: #6b7a93;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  .nav {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: rgba(22, 27, 39, 0.9);
-    border: 1px solid #2a3042;
-    padding: 8px 14px;
-    border-radius: 999px;
-    backdrop-filter: blur(8px);
-  }
-  .nav button {
-    background: #1c2235;
-    border: 1px solid #2e3a52;
-    color: #c5cde0;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .nav button:hover { background: #243049; }
-  .dots { display: flex; gap: 6px; padding: 0 6px; }
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #2e3a52;
-    cursor: pointer;
-  }
-  .dot.active { background: #4f9cf9; }
-
-  .surfaces {
-    padding: 28px 48px 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 18px;
-  }
-  .surface-card {
-    background: #1c2235;
-    border: 1px solid #252f44;
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .surface-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .surface-title { font-size: 14px; font-weight: 700; color: #c5cde0; }
-  .surface-sub {
-    font-size: 10px;
-    color: #4f9cf9;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 600;
-    margin-top: 2px;
-  }
-  .surface-desc { font-size: 12px; color: #9aa5bc; line-height: 1.55; margin-bottom: 12px; }
-  .tool-chip {
-    display: inline-block;
-    font-family: 'SF Mono', Consolas, monospace;
-    font-size: 11px;
-    background: #0f1117;
-    border: 1px solid #2e3a52;
-    color: #a3e635;
-    padding: 3px 8px;
-    border-radius: 6px;
-    margin: 3px 3px 0 0;
-  }
-
+  /* Cover */
   .cover {
-    padding: 100px 64px;
-    text-align: center;
+    padding: 90px 64px; text-align: center;
     background: radial-gradient(ellipse at top, #1f2d4a 0%, #161b27 70%);
   }
-  .cover h1 {
-    font-size: 56px;
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    color: #ffffff;
-    margin-bottom: 16px;
-  }
+  .cover-eyebrow { font-size: 12px; color: #4f9cf9; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-bottom: 16px; }
+  .cover h1 { font-size: 52px; font-weight: 800; letter-spacing: -1.5px; color: #fff; margin-bottom: 20px; line-height: 1.1; }
   .cover h1 span { color: #4f9cf9; }
-  .cover p {
-    font-size: 18px;
-    color: #8892a4;
-    max-width: 700px;
-    margin: 0 auto 40px;
-    line-height: 1.5;
+  .cover p { font-size: 17px; color: #8892a4; max-width: 680px; margin: 0 auto 40px; line-height: 1.6; }
+  .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .chip { background: #1e2636; border: 1px solid #2e3a52; padding: 10px 18px; border-radius: 999px; font-size: 13px; color: #c5cde0; font-weight: 600; }
+
+  /* Stack layers */
+  .stack { padding: 20px 48px 36px; display: flex; flex-direction: column; gap: 8px; }
+  .layer { background: #1c2235; border: 1px solid #252f44; border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; }
+  .layer.hl-blue { border-color: #4f9cf9; background: linear-gradient(90deg, #1c2235 0%, #1f2d4a 100%); }
+  .layer.hl-purple { border-color: #a78bfa; background: linear-gradient(90deg, #1c2235 0%, #2a1f4a 100%); }
+  .layer-name { font-size: 11px; color: #4f9cf9; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 200px; }
+  .layer.hl-purple .layer-name { color: #a78bfa; }
+  .layer-desc { font-size: 13px; color: #9aa5bc; line-height: 1.5; }
+  .layer-desc strong { color: #e8eaf0; }
+
+  /* Pipeline */
+  .pipeline { padding: 20px 48px; display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: stretch; }
+  .pipe { background: #1c2235; border: 1px solid #252f44; border-radius: 12px; padding: 16px; }
+  .pipe-label { font-size: 9px; color: #4f9cf9; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 6px; }
+  .pipe-title { font-size: 12px; font-weight: 700; color: #c5cde0; margin-bottom: 8px; }
+  .pipe-body { font-size: 11px; color: #9aa5bc; line-height: 1.65; }
+  .pipe-body strong { color: #c5cde0; }
+  .arrow { display: flex; align-items: center; color: #4f9cf9; font-size: 20px; font-weight: 700; }
+
+  /* Confidence tiers */
+  .tiers { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+  .tier { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 8px; }
+  .tier.high    { background: #0e3a28; border: 1px solid #34d399; }
+  .tier.med     { background: #3a2a0a; border: 1px solid #fbbf24; }
+  .tier.low     { background: #1a1a4e; border: 1px solid #818cf8; }
+  .tier.conflict{ background: #3a1a1a; border: 1px solid #f87171; }
+  .tier-label { font-size: 11px; font-weight: 700; min-width: 70px; }
+  .tier.high .tier-label    { color: #34d399; }
+  .tier.med  .tier-label    { color: #fbbf24; }
+  .tier.low  .tier-label    { color: #818cf8; }
+  .tier.conflict .tier-label{ color: #f87171; }
+  .tier-desc { font-size: 11px; color: #9aa5bc; }
+
+  /* Tool chips */
+  .tool-chip {
+    display: inline-block; font-family: 'SF Mono', Consolas, monospace;
+    font-size: 11px; background: #0f1117; border: 1px solid #2e3a52;
+    color: #a3e635; padding: 3px 8px; border-radius: 6px; margin: 3px 3px 0 0;
   }
-  .cover .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .cover-chip {
-    background: #1e2636;
-    border: 1px solid #2e3a52;
-    padding: 10px 18px;
-    border-radius: 999px;
-    font-size: 13px;
-    color: #c5cde0;
-    font-weight: 600;
+  .surface-desc { font-size: 12px; color: #9aa5bc; line-height: 1.55; margin-bottom: 10px; }
+
+  /* Footer */
+  .footer { padding: 16px 48px; border-top: 1px solid #2a3042; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .footer-label { font-size: 11px; color: #4a576e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+  .footer-logo { font-size: 13px; font-weight: 700; color: #4f9cf9; letter-spacing: 0.5px; }
+  .slide-counter { font-size: 11px; color: #6b7a93; font-weight: 600; }
+
+  /* Nav */
+  .nav {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; align-items: center;
+    background: rgba(22,27,39,0.9); border: 1px solid #2a3042;
+    padding: 8px 14px; border-radius: 999px; backdrop-filter: blur(8px);
   }
+  .nav button { background: #1c2235; border: 1px solid #2e3a52; color: #c5cde0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .nav button:hover { background: #243049; }
+  .ndots { display: flex; gap: 6px; padding: 0 6px; }
+  .ndot { width: 8px; height: 8px; border-radius: 50%; background: #2e3a52; cursor: pointer; }
+  .ndot.active { background: #4f9cf9; }
 </style>
 </head>
 <body>
-
 <div class="deck">
 
-  <div class="slide active" data-idx="1">
+  <!-- 1. COVER -->
+  <div class="slide active">
     <div class="cover">
-      <h1>RxCore <span>&</span> KCS</h1>
-      <p>The platform powering Reshape's industrial automation agents — and the Knowledge Construction System that feeds it.</p>
+      <div class="cover-eyebrow">Reshape Platform</div>
+      <h1>Industrial AI that knows<br><span>your catalog</span></h1>
+      <p>RxCore is the intelligence engine behind Reshape's agents. It's trained on your product data, connected to your systems, and built to answer industrial automation questions with near-perfect accuracy — at scale.</p>
       <div class="chips">
-        <div class="cover-chip">Platform, not agent</div>
-        <div class="cover-chip">Grounding layer</div>
-        <div class="cover-chip">Graph + RDBMS + Embeddings</div>
+        <div class="chip">99.9% accuracy target</div>
+        <div class="chip">API · MCP · A2A ready</div>
+        <div class="chip">Siemens · Turck · Festo &amp; more</div>
       </div>
     </div>
     <div class="footer">
-      <div class="footer-label">DEV-927 · Short Presentation</div>
+      <div class="footer-label">RxCore &amp; KCS — Platform Overview</div>
       <div class="slide-counter">1 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
 
-  <div class="slide" data-idx="2">
+  <!-- 2. WHAT IS RXCORE -->
+  <div class="slide">
     <div class="header">
       <div class="header-top">
         <div class="title-block">
-          <h1>What is <span>RxCore</span>?</h1>
-          <p class="subtitle">Not an agent — a platform. APIs, connections, knowledge grounding, memory, and data processes that power industrial automation intelligence. Consumed via API, tool, MCP, or A2A.</p>
+          <h1>RxCore is a <span>platform</span>, not a chatbot</h1>
+          <p class="subtitle">Think of it as the engine under the hood. Your customer-facing tools and team applications sit on top of it — RxCore provides the intelligence, data, and accuracy layer that makes all of them reliable.</p>
         </div>
         <div class="slide-tag">Slide 2 · Platform Overview</div>
       </div>
     </div>
-
     <div class="stack">
-      <div class="stack-layer">
-        <div class="stack-label">First-Party Apps</div>
-        <div class="stack-desc"><strong>Chatbots, quote builders, bespoke UIs</strong> — add UI, business logic, prompting strategies, personalization, domain-specific behaviors on top of the core</div>
+      <div class="layer">
+        <div class="layer-name">Your Applications</div>
+        <div class="layer-desc"><strong>Chatbots, quote builders, configurators, search interfaces</strong> — your UX and business logic, built on top of the core</div>
       </div>
-      <div class="stack-layer">
-        <div class="stack-label">External Integrations</div>
-        <div class="stack-desc"><strong>CRMs, websites, email</strong> — route into the system through authentication and integration pathways</div>
+      <div class="layer">
+        <div class="layer-name">Your Existing Systems</div>
+        <div class="layer-desc"><strong>ERP, CRM, website, email</strong> — RxCore connects to what you already have, without replacing it</div>
       </div>
-      <div class="stack-layer grounding">
-        <div class="stack-label">Grounding Layer</div>
-        <div class="stack-desc"><strong>The agentic heart of RxCore</strong> — reasoning pipeline, memory, context, and search intelligence. Understands PLCs, SCADA, HMIs, sensors, drives, motor controls. Targets 99.9% accuracy.</div>
+      <div class="layer hl-purple">
+        <div class="layer-name">Grounding Layer</div>
+        <div class="layer-desc"><strong>The reasoning engine</strong> — understands PLCs, SCADA, drives, sensors, and 100,000+ SKUs. Everything between the user's question and an accurate answer.</div>
       </div>
-      <div class="stack-layer core">
-        <div class="stack-label">RxCore Platform</div>
-        <div class="stack-desc"><strong>Centralized intelligence & infrastructure</strong> — plug-and-play engine consumable via API, tool, MCP, or A2A. Everything above depends on it.</div>
+      <div class="layer hl-blue">
+        <div class="layer-name">RxCore Platform</div>
+        <div class="layer-desc"><strong>Centralized intelligence &amp; infrastructure</strong> — accessible via API, tool, MCP, or agent-to-agent (A2A). Everything above depends on it.</div>
       </div>
-      <div class="stack-layer">
-        <div class="stack-label">Knowledge Construction System</div>
-        <div class="stack-desc"><strong>Builds the knowledge layer that RxCore queries</strong> — pre-constructed graph + RDBMS + embeddings, replacing fragile query-time integrations (see slide 5)</div>
+      <div class="layer">
+        <div class="layer-name">Knowledge Construction System</div>
+        <div class="layer-desc"><strong>Pre-builds your product knowledge</strong> — catalog, specs, compatibility, relationships — so agents answer instantly and reliably (see slide 5)</div>
       </div>
     </div>
-
     <div class="footer">
-      <div class="footer-label">Platform stack</div>
+      <div class="footer-label">Platform architecture</div>
       <div class="slide-counter">2 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
 
-  <div class="slide" data-idx="3">
+  <!-- 3. THREE PILLARS -->
+  <div class="slide">
     <div class="header">
       <div class="header-top">
         <div class="title-block">
-          <h1>Grounding Layer · <span>Three Pillars</span></h1>
-          <p class="subtitle">The grounding layer rests on three engineering disciplines. Together they turn an LLM into an industrial-automation expert.</p>
+          <h1>How the grounding layer <span>works</span></h1>
+          <p class="subtitle">Three engineering disciplines work together to turn a general-purpose AI into a specialist in your product catalog and industrial domain.</p>
         </div>
-        <div class="slide-tag">Slide 3 · Orchestration · Harness · Context</div>
+        <div class="slide-tag">Slide 3 · How It Works</div>
       </div>
     </div>
-
     <div class="body">
-
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-blue">🎛️</div>
-          <div>
-            <div class="pillar-title">Orchestration Engineering</div>
-            <div class="pillar-tag">Behavior & Flow Control</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ib">🎛️</div>
+          <div><div class="card-title">How it reasons</div><div class="card-label">Orchestration</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Prompt engineering</strong> — system prompts, few-shot examples, instructions shape behavior</div></div>
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Skills</strong> — modular capabilities invoked per task (catalog search, spec lookup)</div></div>
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Multi-agents</strong> — specialized agents each handle a slice of the problem</div></div>
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Middleware</strong> — LangChain hooks for logging, guardrails, retries, PII</div></div>
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Custom workflows</strong> — LangGraph topologies for domain-specific reasoning</div></div>
+        <div class="items">
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Purpose-built workflows</strong> — "find a substitute", "check compatibility", "configure a product" follow defined steps, not open-ended improvisation</div></div>
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Right workflow, every time</strong> — the agent selects the appropriate pattern at the start of each turn before doing anything else</div></div>
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Specialized sub-agents</strong> — complex queries are split across focused agents that each handle one piece of the problem in parallel</div></div>
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Built-in safety checks</strong> — inputs and outputs validated automatically; off-topic or unsafe requests are blocked before they reach the answer</div></div>
         </div>
       </div>
-
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-green">🔌</div>
-          <div>
-            <div class="pillar-title">Harness Engineering</div>
-            <div class="pillar-tag">What The Agent Connects To</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ig">🔌</div>
+          <div><div class="card-title">What it knows</div><div class="card-label">Knowledge Tools (from KCS)</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>KCS-generated tools</strong> — stable pre-built interfaces replace fragile direct API calls</div></div>
-          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>graph_search, sql_query, rag_search</strong> — three-way retrieval over the knowledge layer</div></div>
-          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>get_alternatives, check_compatibility</strong> — replacement and fitment reasoning</div></div>
-          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>get_stock_price, find_spare_parts</strong> — live inventory + accessory traversal</div></div>
-          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>ERP, code exec, connections</strong> — business logic outside the knowledge layer</div></div>
+        <div class="items">
+          <div class="item"><div class="dot dg"></div><div class="item-text"><strong>Built from your catalog</strong> — queries structured tools generated from your own product data, not live brand APIs at question time</div></div>
+          <div class="item"><div class="dot dg"></div><div class="item-text"><strong>Understands relationships</strong> — what replaces what, what works with what, which families are compatible</div></div>
+          <div class="item"><div class="dot dg"></div><div class="item-text"><strong>Lifecycle-aware</strong> — always checks active vs. end-of-life status before recommending a product</div></div>
+          <div class="item"><div class="dot dg"></div><div class="item-text"><strong>Live inventory &amp; pricing</strong> — stock levels and prices synced continuously so agents always quote accurately</div></div>
         </div>
       </div>
-
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-teal">🧠</div>
-          <div>
-            <div class="pillar-title">Context Engineering</div>
-            <div class="pillar-tag">Every Token Earns Its Place</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon it">🧠</div>
+          <div><div class="card-title">What it remembers</div><div class="card-label">Context Engineering</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>StripToolHistoryMiddleware</strong> — removes stale tool pairs; fights distraction + poisoning</div></div>
-          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Memory manager</strong> — long-term, conversational, cache tiers</div></div>
-          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Message selection</strong> — System, Tool, Human, AI messages curated per call</div></div>
-          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Trim + summarize + prioritize</strong> — maximize signal within token budget</div></div>
-          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Ordering is deliberate</strong> — not every history message reaches the next call</div></div>
+        <div class="items">
+          <div class="item"><div class="dot dt"></div><div class="item-text"><strong>Three memory layers</strong> — long-term knowledge, the current conversation, and a fast cache for frequently accessed data</div></div>
+          <div class="item"><div class="dot dt"></div><div class="item-text"><strong>No stale distraction</strong> — old tool results are pruned so they don't mislead the model on later turns</div></div>
+          <div class="item"><div class="dot dt"></div><div class="item-text"><strong>Smart summarization</strong> — long conversations are compressed without losing key context from earlier in the session</div></div>
+          <div class="item"><div class="dot dt"></div><div class="item-text"><strong>Curated, not accumulated</strong> — every token in context is there because it's useful, not just because it was said</div></div>
         </div>
       </div>
-
     </div>
-
     <div class="footer">
-      <div class="footer-label">Three engineering disciplines</div>
+      <div class="footer-label">Reasoning · Knowledge · Memory</div>
       <div class="slide-counter">3 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
 
-  <div class="slide" data-idx="4">
+  <!-- 4. PARALLEL RESEARCH + CONFIDENCE -->
+  <div class="slide">
     <div class="header">
       <div class="header-top">
         <div class="title-block">
-          <h1>Orchestration · <span>Parallel Deep Research + Confidence Scoring</span></h1>
-          <p class="subtitle">Every turn fans out KCS tools in parallel. Each source returns evidence with a confidence score. A reconciler merges them into a single answer with an explicit confidence tier — or escalates when sources disagree.</p>
+          <h1>Before answering, <span>RxCore checks everything at once</span></h1>
+          <p class="subtitle">When a user asks a question, the agent fans out across your entire knowledge layer simultaneously, scores every piece of evidence, and only composes an answer once all research is complete — never before.</p>
         </div>
-        <div class="slide-tag">Slide 4 · Orchestration Deep Dive</div>
+        <div class="slide-tag">Slide 4 · Parallel Research &amp; Confidence Scoring</div>
       </div>
     </div>
-
-    <div class="pipeline" style="grid-template-columns: 1fr auto 1fr auto 1fr;">
-      <div class="pipe-box">
-        <div class="pipe-tag">Step 1</div>
-        <div class="pipe-title">Parallel Fan-Out</div>
-        <div class="pipe-list">
-          Agent decomposes query into research sub-tasks, dispatches KCS tools concurrently:<br>
-          • <strong>graph_search</strong> (inferred)<br>
-          • <strong>sql_query</strong> (declared)<br>
-          • <strong>rag_search</strong> (semantic)<br>
-          • <strong>web fallback</strong> if gaps
+    <div class="pipeline">
+      <div class="pipe">
+        <div class="pipe-label">Step 1</div>
+        <div class="pipe-title">Parallel fan-out</div>
+        <div class="pipe-body">
+          All knowledge sources queried simultaneously:<br><br>
+          • <strong>Knowledge graph</strong> — relationships &amp; inferred compatibility<br>
+          • <strong>Product database</strong> — official specs, lifecycle, declared replacements<br>
+          • <strong>Semantic search</strong> — fuzzy natural-language matching<br>
+          • <strong>Web fallback</strong> — fills gaps when internal data is incomplete
         </div>
       </div>
       <div class="arrow">→</div>
-      <div class="pipe-box">
-        <div class="pipe-tag">Step 2</div>
-        <div class="pipe-title">Per-Tool Confidence</div>
-        <div class="pipe-list">
-          Each tool returns evidence + a score:<br>
-          • <strong>Graph</strong> — edge weight, path length, source trust<br>
-          • <strong>SQL</strong> — exact match vs. inferred join<br>
-          • <strong>RAG</strong> — similarity score, chunk relevance<br>
-          • <strong>Structured not-found</strong> — explicit, not silent
+      <div class="pipe">
+        <div class="pipe-label">Step 2</div>
+        <div class="pipe-title">Evidence scoring</div>
+        <div class="pipe-body">
+          Each result carries a confidence score:<br><br>
+          • Graph: edge weight &amp; path length<br>
+          • Database: exact match vs. inferred join<br>
+          • Semantic: similarity score &amp; relevance<br>
+          • Missing data returned as an <strong>explicit signal</strong> — never silently empty
         </div>
       </div>
       <div class="arrow">→</div>
-      <div class="pipe-box">
-        <div class="pipe-tag">Step 3</div>
-        <div class="pipe-title">Reconciler + Tier</div>
-        <div class="pipe-list">
-          Cross-source consensus determines final tier:<br>
-          • <strong>HIGH</strong> — RDBMS + Graph agree<br>
-          • <strong>MEDIUM</strong> — single authoritative source<br>
-          • <strong>LOW</strong> — only semantic / weak evidence<br>
-          • <strong>CONFLICT</strong> → escalate or disclose both
+      <div class="pipe">
+        <div class="pipe-label">Step 3</div>
+        <div class="pipe-title">Reconcile &amp; tier</div>
+        <div class="pipe-body">
+          Cross-source agreement sets the confidence tier:
+          <div class="tiers">
+            <div class="tier high"><div class="tier-label">HIGH</div><div class="tier-desc">Graph + DB agree — stated plainly</div></div>
+            <div class="tier med"><div class="tier-label">MEDIUM</div><div class="tier-desc">Single authoritative source — hedged</div></div>
+            <div class="tier low"><div class="tier-label">LOW</div><div class="tier-desc">Semantic only — uncertainty disclosed</div></div>
+            <div class="tier conflict"><div class="tier-label">CONFLICT</div><div class="tier-desc">Sources disagree — both surfaced</div></div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="body" style="grid-template-columns: 1fr 1fr; padding-top: 8px;">
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-indigo">⚡</div>
-          <div>
-            <div class="pillar-title">Why Parallel Research</div>
-            <div class="pillar-tag">Latency + Evidence Breadth</div>
-          </div>
+    <div class="body" style="grid-template-columns:1fr 1fr; padding-top:8px;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ii">⚡</div>
+          <div><div class="card-title">Why this produces better answers</div><div class="card-label">No early commitment, no guessing</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>Complete-before-respond</strong> — all sub-tasks resolved in the same turn before composing the answer</div></div>
-          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>Multi-source triangulation</strong> — graph + SQL + RAG hit simultaneously, not sequentially</div></div>
-          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>Sub-agents</strong> — specialist researchers per domain (compatibility, lifecycle, pricing) run in parallel</div></div>
-          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>No early commitment</strong> — no anchoring on the first retrieved result</div></div>
+        <div class="items">
+          <div class="item"><div class="dot di"></div><div class="item-text"><strong>All research completes before any answer is written</strong> — the agent cannot short-circuit with a partial result</div></div>
+          <div class="item"><div class="dot di"></div><div class="item-text"><strong>Multi-source triangulation</strong> eliminates the most common AI failure: anchoring on the first result found</div></div>
+          <div class="item"><div class="dot di"></div><div class="item-text"><strong>Explicit "not found" signals</strong> trigger escalation to a broader search — never a fabricated answer to fill the gap</div></div>
         </div>
       </div>
-
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-lime">🎯</div>
-          <div>
-            <div class="pillar-title">How Confidence Propagates</div>
-            <div class="pillar-tag">Scores → Tiers → Behavior</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon il">🎯</div>
+          <div><div class="card-title">What you see as a result</div><div class="card-label">Transparent, trustworthy answers</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Scores attach to evidence</strong> — every retrieved chunk, row, or edge carries a numeric score from its source</div></div>
-          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Consensus boosts tier</strong> — matching answers across surfaces promote HIGH; divergence demotes to LOW or CONFLICT</div></div>
-          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Tier drives phrasing</strong> — HIGH answers are stated plainly; MEDIUM hedge; LOW disclose uncertainty or escalate</div></div>
-          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Transparent basis</strong> — agent can show whether claim came from declared (RDBMS) or inferred (graph) evidence</div></div>
+        <div class="items">
+          <div class="item"><div class="dot dl"></div><div class="item-text"><strong>Every claim is sourced</strong> — the agent can show whether the answer came from official specs or inferred compatibility data</div></div>
+          <div class="item"><div class="dot dl"></div><div class="item-text"><strong>Uncertainty is surfaced, not hidden</strong> — if evidence is weak, the agent says so rather than sounding confident about a guess</div></div>
+          <div class="item"><div class="dot dl"></div><div class="item-text"><strong>Conflicts are shown</strong> — when sources disagree, both perspectives are surfaced so your team can decide</div></div>
         </div>
       </div>
     </div>
-
     <div class="footer">
-      <div class="footer-label">Parallel research · Scored evidence · Reconciled answer</div>
+      <div class="footer-label">Parallel research · Scored evidence · Transparent answers</div>
       <div class="slide-counter">4 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
 
-  <div class="slide" data-idx="5">
+  <!-- 5. KCS -->
+  <div class="slide">
     <div class="header">
       <div class="header-top">
         <div class="title-block">
-          <h1>Knowledge Construction System <span>(KCS)</span></h1>
-          <p class="subtitle">Shifts knowledge assembly from query time to build time. Fixes the fragility problem (APIs break, rate-limits hit) and the representation problem (PDF chunks have no structure).</p>
+          <h1>We train a specialist <span>before they start the job</span></h1>
+          <p class="subtitle">The Knowledge Construction System (KCS) pre-builds a structured, queryable knowledge layer from your catalog data — so the agent never scrambles to find information at the moment a customer asks a question.</p>
         </div>
-        <div class="slide-tag">Slide 5 · Build-Time Knowledge Assembly</div>
+        <div class="slide-tag">Slide 5 · Knowledge Construction System</div>
       </div>
     </div>
-
     <div class="pipeline">
-      <div class="pipe-box">
-        <div class="pipe-tag">Input</div>
-        <div class="pipe-title">Data Sources</div>
-        <div class="pipe-list">
-          • <strong>Files</strong> — PDFs, Excel, images (webhook / upload / scheduled)<br>
-          • <strong>Web</strong> — crawls, scrapes, structured extraction<br>
-          • <strong>Domain</strong> — brand APIs (SiePortal), FDE chat, other agents
+      <div class="pipe">
+        <div class="pipe-label">Input</div>
+        <div class="pipe-title">Your data sources</div>
+        <div class="pipe-body">
+          • <strong>Files</strong> — PDF catalogs, datasheets, Excel specs<br>
+          • <strong>Web</strong> — brand websites, product pages, documentation<br>
+          • <strong>APIs</strong> — official brand APIs (e.g. Siemens SiePortal)<br>
+          • <strong>Experts</strong> — your team contributes knowledge via chat
         </div>
       </div>
       <div class="arrow">→</div>
-      <div class="pipe-box">
-        <div class="pipe-tag">Agent</div>
-        <div class="pipe-title">KG Constructor</div>
-        <div class="pipe-list">
-          • <strong>Ingestion pipeline</strong> — parse, normalize, dedupe, entity extract<br>
-          • <strong>Schema modeling agent</strong> — iterates taxonomy, designs RDBMS, infers rules<br>
-          • <strong>Validation + FDE review</strong> — flags conflicts, queues proposals
+      <div class="pipe">
+        <div class="pipe-label">Process</div>
+        <div class="pipe-title">KG Constructor agent</div>
+        <div class="pipe-body">
+          An AI agent that builds the knowledge layer:<br><br>
+          • <strong>Ingestion</strong> — parses, normalizes, and deduplicates all sources<br>
+          • <strong>Schema modeling</strong> — learns how this brand organizes products<br>
+          • <strong>Validation loop</strong> — flags conflicts, proposes rules, queues changes for your team to review
         </div>
       </div>
       <div class="arrow">→</div>
-      <div class="pipe-box">
-        <div class="pipe-tag">Output</div>
-        <div class="pipe-title">Knowledge Layer</div>
-        <div class="pipe-list">
-          • <strong>Neo4j graph</strong> — inferred relationships, taxonomy<br>
-          • <strong>RDBMS</strong> — source-of-truth declarations from APIs<br>
-          • <strong>Embeddings</strong> — fuzzy semantic search over both
+      <div class="pipe">
+        <div class="pipe-label">Output</div>
+        <div class="pipe-title">Structured knowledge layer</div>
+        <div class="pipe-body">
+          • <strong>Knowledge graph</strong> — product relationships, compatibility, replacement chains<br>
+          • <strong>Product database</strong> — specs, lifecycle, stock, pricing from official sources<br>
+          • <strong>Semantic index</strong> — enables natural-language product search
         </div>
       </div>
     </div>
-
-    <div class="body" style="grid-template-columns: 1fr 1fr; padding-top: 8px;">
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-orange">📚</div>
-          <div>
-            <div class="pillar-title">Brand-Specific Learning</div>
-            <div class="pillar-tag">Expert-Per-Brand Over Time</div>
-          </div>
+    <div class="body" style="grid-template-columns:1fr 1fr; padding-top:8px;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon io">📈</div>
+          <div><div class="card-title">Gets smarter with every brand</div><div class="card-label">Brand-specific learning</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-orange"></div><div class="item-text"><strong>Long-term memory</strong> — retains schema decisions, FDE corrections, extraction patterns per brand</div></div>
-          <div class="item"><div class="item-dot dot-orange"></div><div class="item-text"><strong>Prompt learning</strong> — adapts to Siemens PDF tables, ABB API quirks, etc.</div></div>
-          <div class="item"><div class="item-dot dot-orange"></div><div class="item-text"><strong>Agent optimization</strong> — 20 iterations for brand 1, 5 for brand 10</div></div>
+        <div class="items">
+          <div class="item"><div class="dot do"></div><div class="item-text"><strong>Memory across onboardings</strong> — schema decisions and corrections from Siemens directly inform how ABB or Rockwell are processed next</div></div>
+          <div class="item"><div class="dot do"></div><div class="item-text"><strong>Faster with each brand</strong> — what takes 20 iterations for brand 1 takes 5 for brand 10</div></div>
+          <div class="item"><div class="dot do"></div><div class="item-text"><strong>Adapts to each catalog structure</strong> — Siemens, Rockwell, and Schneider organize products differently; KCS learns each</div></div>
         </div>
       </div>
-
-      <div class="pillar">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-rose">🔄</div>
-          <div>
-            <div class="pillar-title">Job Sync</div>
-            <div class="pillar-tag">Living, Not One-Shot</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon iro">🔄</div>
+          <div><div class="card-title">Stays up to date automatically</div><div class="card-label">Continuous sync</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-rose"></div><div class="item-text"><strong>Triggers</strong> — brand API updates, webhook file arrivals, scheduled freshness checks</div></div>
-          <div class="item"><div class="item-dot dot-rose"></div><div class="item-text"><strong>Diff against graph</strong> — auto-apply low-risk changes (price, stock)</div></div>
-          <div class="item"><div class="item-dot dot-rose"></div><div class="item-text"><strong>Queue structural changes</strong> — new families, changed relationships routed to FDE review</div></div>
+        <div class="items">
+          <div class="item"><div class="dot dro"></div><div class="item-text"><strong>Triggered by changes</strong> — new catalog files, API updates, or scheduled syncs kick off a targeted refresh</div></div>
+          <div class="item"><div class="dot dro"></div><div class="item-text"><strong>Low-risk changes auto-applied</strong> — price and stock updates go straight in; structural changes queue for review</div></div>
+          <div class="item"><div class="dot dro"></div><div class="item-text"><strong>High-frequency pricing &amp; inventory</strong> — synced more often than taxonomy so agents always quote accurately</div></div>
         </div>
       </div>
     </div>
-
     <div class="footer">
-      <div class="footer-label">Query-time → build-time</div>
+      <div class="footer-label">Build-time knowledge · Brand learning · Continuous sync</div>
       <div class="slide-counter">5 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
 
-  <div class="slide" data-idx="5">
+  <!-- 6. KNOWLEDGE LAYER → TOOLS -->
+  <div class="slide">
     <div class="header">
       <div class="header-top">
         <div class="title-block">
-          <h1>Knowledge Layer <span>→ Tools</span></h1>
-          <p class="subtitle">KCS produces three complementary query surfaces. Grounding layer consumes them through stable generated tools — never direct brand APIs at query time.</p>
+          <h1>Three ways to answer <span>any product question accurately</span></h1>
+          <p class="subtitle">KCS produces three complementary knowledge surfaces. The grounding layer queries all three through stable, generated tools — it never calls brand APIs directly at the moment a question is asked.</p>
         </div>
-        <div class="slide-tag">Slide 6 · Query Surfaces & Generated Tools</div>
+        <div class="slide-tag">Slide 6 · Knowledge Layer &amp; Tools</div>
       </div>
     </div>
-
-    <div class="surfaces">
-      <div class="surface-card">
-        <div class="surface-head">
-          <div class="pillar-icon icon-purple">🕸️</div>
-          <div>
-            <div class="surface-title">Knowledge Graph</div>
-            <div class="surface-sub">Neo4j · Inferred</div>
-          </div>
+    <div class="body" style="padding-bottom:12px;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ip">🕸️</div>
+          <div><div class="card-title">Knowledge Graph</div><div class="card-label">Relationships &amp; Inferred Compatibility</div></div>
         </div>
-        <div class="surface-desc">Taxonomy of the full product catalog and relationships the data <em>implies</em>. Inferred compatibility, replacement chains, cross-family recommendations. "What makes sense from a data perspective."</div>
+        <div class="surface-desc">Captures the structure of your product catalog and the relationships your data implies — even when no single source explicitly states them. Powers "what replaces this?", "what works with that?", and cross-family recommendations.</div>
         <div>
           <span class="tool-chip">graph_search</span>
           <span class="tool-chip">get_taxonomy</span>
@@ -702,16 +448,12 @@
           <span class="tool-chip">recommend_modules</span>
         </div>
       </div>
-
-      <div class="surface-card">
-        <div class="surface-head">
-          <div class="pillar-icon icon-green">🗄️</div>
-          <div>
-            <div class="surface-title">RDBMS</div>
-            <div class="surface-sub">Source of Truth · Declared</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ig">🗄️</div>
+          <div><div class="card-title">Product Database</div><div class="card-label">Official Source of Truth</div></div>
         </div>
-        <div class="surface-desc">What APIs and official sources <em>explicitly state</em>. Specs, official replacements, lifecycle, stock, pricing. Stock + pricing sync at higher cadence than taxonomy.</div>
+        <div class="surface-desc">What brand APIs and official sources explicitly declare: specs, certified replacements, lifecycle status, pricing, and stock. Kept separate from the graph so the agent can always be transparent about whether a claim is official or inferred.</div>
         <div>
           <span class="tool-chip">sql_query</span>
           <span class="tool-chip">get_stock_price</span>
@@ -719,41 +461,32 @@
           <span class="tool-chip">check_compatibility</span>
         </div>
       </div>
-
-      <div class="surface-card">
-        <div class="surface-head">
-          <div class="pillar-icon icon-amber">✨</div>
-          <div>
-            <div class="surface-title">Embeddings</div>
-            <div class="surface-sub">Semantic · Fuzzy</div>
-          </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ia">✨</div>
+          <div><div class="card-title">Semantic Index</div><div class="card-label">Natural Language Product Search</div></div>
         </div>
-        <div class="surface-desc">Generated from RDBMS rows and graph nodes/edges. Handles vague natural-language intent — "something like the S7-1200 but cheaper" — surfaces candidates for graph/SQL enrichment.</div>
+        <div class="surface-desc">Embeddings generated from both the database and the knowledge graph. Handles vague, human-style queries like "something like the S7-1200 but cheaper" — surfaces candidates the agent then enriches with structured data.</div>
         <div>
           <span class="tool-chip">rag_search</span>
         </div>
       </div>
     </div>
-
-    <div class="body" style="grid-template-columns: 1fr; padding-top: 0;">
-      <div class="pillar full">
-        <div class="pillar-header">
-          <div class="pillar-icon icon-blue">🧩</div>
-          <div>
-            <div class="pillar-title">Example — Onboarding Siemens</div>
-            <div class="pillar-tag">Knowledge → Tools → Grounded Answers</div>
-          </div>
+    <div class="body" style="grid-template-columns:1fr; padding-top:0;">
+      <div class="card full">
+        <div class="card-head">
+          <div class="card-icon ib">🧩</div>
+          <div><div class="card-title">What onboarding a new brand looks like — Example: Siemens</div><div class="card-label">Knowledge → Tools → Grounded Answers</div></div>
         </div>
-        <div class="pillar-items">
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>1. Feed</strong> — SiePortal API + PDF catalogs feed the KG Constructor</div></div>
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>2. Build</strong> — Siemens-specific taxonomy graph built; RDBMS populated with declared specs</div></div>
-          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>3. Query</strong> — Grounding layer gets Siemens tools; never calls SiePortal at query time</div></div>
+        <div class="items">
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Feed</strong> — SiePortal API and PDF catalogs are ingested by the KG Constructor</div></div>
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Build</strong> — a Siemens-specific knowledge graph is constructed; the product database is populated with official declarations from the API</div></div>
+          <div class="item"><div class="dot db"></div><div class="item-text"><strong>Query</strong> — the grounding layer receives Siemens-specific tools and answers any question without ever calling SiePortal at query time</div></div>
         </div>
       </div>
     </div>
-
     <div class="footer">
-      <div class="footer-label">Three surfaces · one agent</div>
+      <div class="footer-label">Graph · Database · Semantic — three surfaces, one agent</div>
       <div class="slide-counter">6 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
@@ -762,39 +495,38 @@
 </div>
 
 <div class="nav">
-  <button id="prev" aria-label="Previous">‹</button>
-  <div class="dots" id="dots"></div>
-  <button id="next" aria-label="Next">›</button>
+  <button id="prev">‹</button>
+  <div class="ndots" id="dots"></div>
+  <button id="next">›</button>
 </div>
 
 <script>
-  const slides = document.querySelectorAll('.slide');
+  const slides = Array.from(document.querySelectorAll('.slide'));
   const dotsEl = document.getElementById('dots');
-  let current = 0;
+  let cur = 0;
 
   slides.forEach((_, i) => {
     const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.className = 'ndot' + (i === 0 ? ' active' : '');
     d.addEventListener('click', () => go(i));
     dotsEl.appendChild(d);
   });
 
   function go(i) {
     if (i < 0 || i >= slides.length) return;
-    slides[current].classList.remove('active');
-    dotsEl.children[current].classList.remove('active');
-    current = i;
-    slides[current].classList.add('active');
-    dotsEl.children[current].classList.add('active');
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = i;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
   }
 
-  document.getElementById('prev').addEventListener('click', () => go(current - 1));
-  document.getElementById('next').addEventListener('click', () => go(current + 1));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ') go(current + 1);
-    if (e.key === 'ArrowLeft') go(current - 1);
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') go(cur + 1);
+    if (e.key === 'ArrowLeft') go(cur - 1);
   });
 </script>
-
 </body>
 </html>
