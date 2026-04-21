@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RxCore & KCS — Short Presentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f1117;
+    color: #e8eaf0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  .deck {
+    width: 1280px;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .slide {
+    width: 100%;
+    background: #161b27;
+    border-radius: 16px;
+    border: 1px solid #2a3042;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    display: none;
+  }
+
+  .slide.active { display: block; }
+
+  .header {
+    padding: 36px 48px 24px;
+    border-bottom: 1px solid #2a3042;
+    background: linear-gradient(135deg, #161b27 0%, #1c2438 100%);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .title-block h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+
+  .title-block h1 span { color: #4f9cf9; }
+
+  .title-block .subtitle {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #8892a4;
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 720px;
+  }
+
+  .slide-tag {
+    font-size: 11px;
+    color: #4a576e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    padding-top: 6px;
+  }
+
+  .body {
+    padding: 28px 48px 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+  }
+
+  .pillar {
+    background: #1c2235;
+    border: 1px solid #252f44;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pillar-header { display: flex; align-items: center; gap: 10px; }
+
+  .pillar-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue   { background: #1a3a6b; }
+  .icon-purple { background: #2d1b4e; }
+  .icon-green  { background: #0e3a28; }
+  .icon-amber  { background: #3a2a0a; }
+  .icon-red    { background: #3a1a1a; }
+  .icon-teal   { background: #0a2e32; }
+  .icon-orange { background: #3a1e0a; }
+  .icon-rose   { background: #3a0a1e; }
+  .icon-indigo { background: #1a1a4e; }
+  .icon-lime   { background: #1a3a0a; }
+
+  .pillar-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #c5cde0;
+    line-height: 1.3;
+    letter-spacing: 0.2px;
+  }
+
+  .pillar-tag {
+    font-size: 10px;
+    color: #4f9cf9;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
+  .pillar-items { display: flex; flex-direction: column; gap: 7px; }
+  .item { display: flex; align-items: flex-start; gap: 8px; }
+  .item-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .dot-blue   { background: #4f9cf9; }
+  .dot-purple { background: #a78bfa; }
+  .dot-green  { background: #34d399; }
+  .dot-amber  { background: #fbbf24; }
+  .dot-red    { background: #f87171; }
+  .dot-teal   { background: #2dd4bf; }
+  .dot-orange { background: #fb923c; }
+  .dot-rose   { background: #fb7185; }
+  .dot-indigo { background: #818cf8; }
+  .dot-lime   { background: #a3e635; }
+
+  .item-text { font-size: 12px; color: #9aa5bc; line-height: 1.5; }
+  .item-text strong { color: #c5cde0; font-weight: 600; }
+
+  .pillar.wide { grid-column: span 2; }
+  .wide .pillar-items { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 20px; }
+  .pillar.full { grid-column: span 3; }
+  .full .pillar-items { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px 24px; }
+
+  .stack { padding: 20px 48px 36px; display: flex; flex-direction: column; gap: 10px; }
+
+  .stack-layer {
+    background: #1c2235;
+    border: 1px solid #252f44;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .stack-layer.core { border-color: #4f9cf9; background: linear-gradient(90deg, #1c2235 0%, #1f2d4a 100%); }
+  .stack-layer.grounding { border-color: #a78bfa; background: linear-gradient(90deg, #1c2235 0%, #2a1f4a 100%); }
+
+  .stack-label {
+    font-size: 11px;
+    color: #4f9cf9;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 180px;
+  }
+  .stack-layer.grounding .stack-label { color: #a78bfa; }
+
+  .stack-desc { font-size: 13px; color: #9aa5bc; line-height: 1.5; }
+  .stack-desc strong { color: #e8eaf0; }
+
+  .pipeline {
+    padding: 20px 48px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .pipe-box {
+    background: #1c2235;
+    border: 1px solid #252f44;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .pipe-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #c5cde0;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .pipe-tag {
+    font-size: 9px;
+    color: #4f9cf9;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .pipe-list { font-size: 11px; color: #9aa5bc; line-height: 1.6; }
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: #4f9cf9;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .footer {
+    padding: 16px 48px;
+    border-top: 1px solid #2a3042;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .footer-label {
+    font-size: 11px;
+    color: #4a576e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+  }
+
+  .footer-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #4f9cf9;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .slide-counter {
+    font-size: 11px;
+    color: #6b7a93;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: rgba(22, 27, 39, 0.9);
+    border: 1px solid #2a3042;
+    padding: 8px 14px;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+  }
+  .nav button {
+    background: #1c2235;
+    border: 1px solid #2e3a52;
+    color: #c5cde0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav button:hover { background: #243049; }
+  .dots { display: flex; gap: 6px; padding: 0 6px; }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #2e3a52;
+    cursor: pointer;
+  }
+  .dot.active { background: #4f9cf9; }
+
+  .surfaces {
+    padding: 28px 48px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+  }
+  .surface-card {
+    background: #1c2235;
+    border: 1px solid #252f44;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .surface-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .surface-title { font-size: 14px; font-weight: 700; color: #c5cde0; }
+  .surface-sub {
+    font-size: 10px;
+    color: #4f9cf9;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .surface-desc { font-size: 12px; color: #9aa5bc; line-height: 1.55; margin-bottom: 12px; }
+  .tool-chip {
+    display: inline-block;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    background: #0f1117;
+    border: 1px solid #2e3a52;
+    color: #a3e635;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin: 3px 3px 0 0;
+  }
+
+  .cover {
+    padding: 100px 64px;
+    text-align: center;
+    background: radial-gradient(ellipse at top, #1f2d4a 0%, #161b27 70%);
+  }
+  .cover h1 {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: #ffffff;
+    margin-bottom: 16px;
+  }
+  .cover h1 span { color: #4f9cf9; }
+  .cover p {
+    font-size: 18px;
+    color: #8892a4;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    line-height: 1.5;
+  }
+  .cover .chips { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cover-chip {
+    background: #1e2636;
+    border: 1px solid #2e3a52;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #c5cde0;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <div class="slide active" data-idx="1">
+    <div class="cover">
+      <h1>RxCore <span>&</span> KCS</h1>
+      <p>The platform powering Reshape's industrial automation agents — and the Knowledge Construction System that feeds it.</p>
+      <div class="chips">
+        <div class="cover-chip">Platform, not agent</div>
+        <div class="cover-chip">Grounding layer</div>
+        <div class="cover-chip">Graph + RDBMS + Embeddings</div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-label">DEV-927 · Short Presentation</div>
+      <div class="slide-counter">1 / 5</div>
+      <div class="footer-logo">Reshape</div>
+    </div>
+  </div>
+
+  <div class="slide" data-idx="2">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-block">
+          <h1>What is <span>RxCore</span>?</h1>
+          <p class="subtitle">Not an agent — a platform. APIs, connections, knowledge grounding, memory, and data processes that power industrial automation intelligence. Consumed via API, tool, MCP, or A2A.</p>
+        </div>
+        <div class="slide-tag">Slide 2 · Platform Overview</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="stack-layer">
+        <div class="stack-label">First-Party Apps</div>
+        <div class="stack-desc"><strong>Chatbots, quote builders, bespoke UIs</strong> — add UI, business logic, prompting strategies, personalization, domain-specific behaviors on top of the core</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-label">External Integrations</div>
+        <div class="stack-desc"><strong>CRMs, websites, email</strong> — route into the system through authentication and integration pathways</div>
+      </div>
+      <div class="stack-layer grounding">
+        <div class="stack-label">Grounding Layer</div>
+        <div class="stack-desc"><strong>The agentic heart of RxCore</strong> — reasoning pipeline, memory, context, and search intelligence. Understands PLCs, SCADA, HMIs, sensors, drives, motor controls. Targets 99.9% accuracy.</div>
+      </div>
+      <div class="stack-layer core">
+        <div class="stack-label">RxCore Platform</div>
+        <div class="stack-desc"><strong>Centralized intelligence & infrastructure</strong> — plug-and-play engine consumable via API, tool, MCP, or A2A. Everything above depends on it.</div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-label">Knowledge Construction System</div>
+        <div class="stack-desc"><strong>Builds the knowledge layer that RxCore queries</strong> — pre-constructed graph + RDBMS + embeddings, replacing fragile query-time integrations (see slide 4)</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-label">Platform stack</div>
+      <div class="slide-counter">2 / 5</div>
+      <div class="footer-logo">Reshape</div>
+    </div>
+  </div>
+
+  <div class="slide" data-idx="3">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-block">
+          <h1>Grounding Layer · <span>Three Pillars</span></h1>
+          <p class="subtitle">The grounding layer rests on three engineering disciplines. Together they turn an LLM into an industrial-automation expert.</p>
+        </div>
+        <div class="slide-tag">Slide 3 · Orchestration · Harness · Context</div>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-blue">🎛️</div>
+          <div>
+            <div class="pillar-title">Orchestration Engineering</div>
+            <div class="pillar-tag">Behavior & Flow Control</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Prompt engineering</strong> — system prompts, few-shot examples, instructions shape behavior</div></div>
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Skills</strong> — modular capabilities invoked per task (catalog search, spec lookup)</div></div>
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Multi-agents</strong> — specialized agents each handle a slice of the problem</div></div>
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Middleware</strong> — LangChain hooks for logging, guardrails, retries, PII</div></div>
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>Custom workflows</strong> — LangGraph topologies for domain-specific reasoning</div></div>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-green">🔌</div>
+          <div>
+            <div class="pillar-title">Harness Engineering</div>
+            <div class="pillar-tag">What The Agent Connects To</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>KCS-generated tools</strong> — stable pre-built interfaces replace fragile direct API calls</div></div>
+          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>graph_search, sql_query, rag_search</strong> — three-way retrieval over the knowledge layer</div></div>
+          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>get_alternatives, check_compatibility</strong> — replacement and fitment reasoning</div></div>
+          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>get_stock_price, find_spare_parts</strong> — live inventory + accessory traversal</div></div>
+          <div class="item"><div class="item-dot dot-green"></div><div class="item-text"><strong>ERP, code exec, connections</strong> — business logic outside the knowledge layer</div></div>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-teal">🧠</div>
+          <div>
+            <div class="pillar-title">Context Engineering</div>
+            <div class="pillar-tag">Every Token Earns Its Place</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>StripToolHistoryMiddleware</strong> — removes stale tool pairs; fights distraction + poisoning</div></div>
+          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Memory manager</strong> — long-term, conversational, cache tiers</div></div>
+          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Message selection</strong> — System, Tool, Human, AI messages curated per call</div></div>
+          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Trim + summarize + prioritize</strong> — maximize signal within token budget</div></div>
+          <div class="item"><div class="item-dot dot-teal"></div><div class="item-text"><strong>Ordering is deliberate</strong> — not every history message reaches the next call</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div class="footer-label">Three engineering disciplines</div>
+      <div class="slide-counter">3 / 5</div>
+      <div class="footer-logo">Reshape</div>
+    </div>
+  </div>
+
+  <div class="slide" data-idx="4">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-block">
+          <h1>Knowledge Construction System <span>(KCS)</span></h1>
+          <p class="subtitle">Shifts knowledge assembly from query time to build time. Fixes the fragility problem (APIs break, rate-limits hit) and the representation problem (PDF chunks have no structure).</p>
+        </div>
+        <div class="slide-tag">Slide 4 · Build-Time Knowledge Assembly</div>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-box">
+        <div class="pipe-tag">Input</div>
+        <div class="pipe-title">Data Sources</div>
+        <div class="pipe-list">
+          • <strong>Files</strong> — PDFs, Excel, images (webhook / upload / scheduled)<br>
+          • <strong>Web</strong> — crawls, scrapes, structured extraction<br>
+          • <strong>Domain</strong> — brand APIs (SiePortal), FDE chat, other agents
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pipe-box">
+        <div class="pipe-tag">Agent</div>
+        <div class="pipe-title">KG Constructor</div>
+        <div class="pipe-list">
+          • <strong>Ingestion pipeline</strong> — parse, normalize, dedupe, entity extract<br>
+          • <strong>Schema modeling agent</strong> — iterates taxonomy, designs RDBMS, infers rules<br>
+          • <strong>Validation + FDE review</strong> — flags conflicts, queues proposals
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pipe-box">
+        <div class="pipe-tag">Output</div>
+        <div class="pipe-title">Knowledge Layer</div>
+        <div class="pipe-list">
+          • <strong>Neo4j graph</strong> — inferred relationships, taxonomy<br>
+          • <strong>RDBMS</strong> — source-of-truth declarations from APIs<br>
+          • <strong>Embeddings</strong> — fuzzy semantic search over both
+        </div>
+      </div>
+    </div>
+
+    <div class="body" style="grid-template-columns: 1fr 1fr; padding-top: 8px;">
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-orange">📚</div>
+          <div>
+            <div class="pillar-title">Brand-Specific Learning</div>
+            <div class="pillar-tag">Expert-Per-Brand Over Time</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-orange"></div><div class="item-text"><strong>Long-term memory</strong> — retains schema decisions, FDE corrections, extraction patterns per brand</div></div>
+          <div class="item"><div class="item-dot dot-orange"></div><div class="item-text"><strong>Prompt learning</strong> — adapts to Siemens PDF tables, ABB API quirks, etc.</div></div>
+          <div class="item"><div class="item-dot dot-orange"></div><div class="item-text"><strong>Agent optimization</strong> — 20 iterations for brand 1, 5 for brand 10</div></div>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-rose">🔄</div>
+          <div>
+            <div class="pillar-title">Job Sync</div>
+            <div class="pillar-tag">Living, Not One-Shot</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-rose"></div><div class="item-text"><strong>Triggers</strong> — brand API updates, webhook file arrivals, scheduled freshness checks</div></div>
+          <div class="item"><div class="item-dot dot-rose"></div><div class="item-text"><strong>Diff against graph</strong> — auto-apply low-risk changes (price, stock)</div></div>
+          <div class="item"><div class="item-dot dot-rose"></div><div class="item-text"><strong>Queue structural changes</strong> — new families, changed relationships routed to FDE review</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-label">Query-time → build-time</div>
+      <div class="slide-counter">4 / 5</div>
+      <div class="footer-logo">Reshape</div>
+    </div>
+  </div>
+
+  <div class="slide" data-idx="5">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-block">
+          <h1>Knowledge Layer <span>→ Tools</span></h1>
+          <p class="subtitle">KCS produces three complementary query surfaces. Grounding layer consumes them through stable generated tools — never direct brand APIs at query time.</p>
+        </div>
+        <div class="slide-tag">Slide 5 · Query Surfaces & Generated Tools</div>
+      </div>
+    </div>
+
+    <div class="surfaces">
+      <div class="surface-card">
+        <div class="surface-head">
+          <div class="pillar-icon icon-purple">🕸️</div>
+          <div>
+            <div class="surface-title">Knowledge Graph</div>
+            <div class="surface-sub">Neo4j · Inferred</div>
+          </div>
+        </div>
+        <div class="surface-desc">Taxonomy of the full product catalog and relationships the data <em>implies</em>. Inferred compatibility, replacement chains, cross-family recommendations. "What makes sense from a data perspective."</div>
+        <div>
+          <span class="tool-chip">graph_search</span>
+          <span class="tool-chip">get_taxonomy</span>
+          <span class="tool-chip">find_spare_parts</span>
+          <span class="tool-chip">recommend_modules</span>
+        </div>
+      </div>
+
+      <div class="surface-card">
+        <div class="surface-head">
+          <div class="pillar-icon icon-green">🗄️</div>
+          <div>
+            <div class="surface-title">RDBMS</div>
+            <div class="surface-sub">Source of Truth · Declared</div>
+          </div>
+        </div>
+        <div class="surface-desc">What APIs and official sources <em>explicitly state</em>. Specs, official replacements, lifecycle, stock, pricing. Stock + pricing sync at higher cadence than taxonomy.</div>
+        <div>
+          <span class="tool-chip">sql_query</span>
+          <span class="tool-chip">get_stock_price</span>
+          <span class="tool-chip">get_alternatives</span>
+          <span class="tool-chip">check_compatibility</span>
+        </div>
+      </div>
+
+      <div class="surface-card">
+        <div class="surface-head">
+          <div class="pillar-icon icon-amber">✨</div>
+          <div>
+            <div class="surface-title">Embeddings</div>
+            <div class="surface-sub">Semantic · Fuzzy</div>
+          </div>
+        </div>
+        <div class="surface-desc">Generated from RDBMS rows and graph nodes/edges. Handles vague natural-language intent — "something like the S7-1200 but cheaper" — surfaces candidates for graph/SQL enrichment.</div>
+        <div>
+          <span class="tool-chip">rag_search</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body" style="grid-template-columns: 1fr; padding-top: 0;">
+      <div class="pillar full">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-blue">🧩</div>
+          <div>
+            <div class="pillar-title">Example — Onboarding Siemens</div>
+            <div class="pillar-tag">Knowledge → Tools → Grounded Answers</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>1. Feed</strong> — SiePortal API + PDF catalogs feed the KG Constructor</div></div>
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>2. Build</strong> — Siemens-specific taxonomy graph built; RDBMS populated with declared specs</div></div>
+          <div class="item"><div class="item-dot dot-blue"></div><div class="item-text"><strong>3. Query</strong> — Grounding layer gets Siemens tools; never calls SiePortal at query time</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-label">Three surfaces · one agent</div>
+      <div class="slide-counter">5 / 5</div>
+      <div class="footer-logo">Reshape</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous">‹</button>
+  <div class="dots" id="dots"></div>
+  <button id="next" aria-label="Next">›</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(i) {
+    if (i < 0 || i >= slides.length) return;
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(current - 1));
+  document.getElementById('next').addEventListener('click', () => go(current + 1));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') go(current + 1);
+    if (e.key === 'ArrowLeft') go(current - 1);
+  });
+</script>
+
+</body>
+</html>
