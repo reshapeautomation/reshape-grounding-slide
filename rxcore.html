@@ -383,7 +383,7 @@
     </div>
     <div class="footer">
       <div class="footer-label">DEV-927 · Short Presentation</div>
-      <div class="slide-counter">1 / 5</div>
+      <div class="slide-counter">1 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
@@ -418,13 +418,13 @@
       </div>
       <div class="stack-layer">
         <div class="stack-label">Knowledge Construction System</div>
-        <div class="stack-desc"><strong>Builds the knowledge layer that RxCore queries</strong> — pre-constructed graph + RDBMS + embeddings, replacing fragile query-time integrations (see slide 4)</div>
+        <div class="stack-desc"><strong>Builds the knowledge layer that RxCore queries</strong> — pre-constructed graph + RDBMS + embeddings, replacing fragile query-time integrations (see slide 5)</div>
       </div>
     </div>
 
     <div class="footer">
       <div class="footer-label">Platform stack</div>
-      <div class="slide-counter">2 / 5</div>
+      <div class="slide-counter">2 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
@@ -497,7 +497,7 @@
 
     <div class="footer">
       <div class="footer-label">Three engineering disciplines</div>
-      <div class="slide-counter">3 / 5</div>
+      <div class="slide-counter">3 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
@@ -506,10 +506,100 @@
     <div class="header">
       <div class="header-top">
         <div class="title-block">
+          <h1>Orchestration · <span>Parallel Deep Research + Confidence Scoring</span></h1>
+          <p class="subtitle">Every turn fans out KCS tools in parallel. Each source returns evidence with a confidence score. A reconciler merges them into a single answer with an explicit confidence tier — or escalates when sources disagree.</p>
+        </div>
+        <div class="slide-tag">Slide 4 · Orchestration Deep Dive</div>
+      </div>
+    </div>
+
+    <div class="pipeline" style="grid-template-columns: 1fr auto 1fr auto 1fr;">
+      <div class="pipe-box">
+        <div class="pipe-tag">Step 1</div>
+        <div class="pipe-title">Parallel Fan-Out</div>
+        <div class="pipe-list">
+          Agent decomposes query into research sub-tasks, dispatches KCS tools concurrently:<br>
+          • <strong>graph_search</strong> (inferred)<br>
+          • <strong>sql_query</strong> (declared)<br>
+          • <strong>rag_search</strong> (semantic)<br>
+          • <strong>web fallback</strong> if gaps
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pipe-box">
+        <div class="pipe-tag">Step 2</div>
+        <div class="pipe-title">Per-Tool Confidence</div>
+        <div class="pipe-list">
+          Each tool returns evidence + a score:<br>
+          • <strong>Graph</strong> — edge weight, path length, source trust<br>
+          • <strong>SQL</strong> — exact match vs. inferred join<br>
+          • <strong>RAG</strong> — similarity score, chunk relevance<br>
+          • <strong>Structured not-found</strong> — explicit, not silent
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="pipe-box">
+        <div class="pipe-tag">Step 3</div>
+        <div class="pipe-title">Reconciler + Tier</div>
+        <div class="pipe-list">
+          Cross-source consensus determines final tier:<br>
+          • <strong>HIGH</strong> — RDBMS + Graph agree<br>
+          • <strong>MEDIUM</strong> — single authoritative source<br>
+          • <strong>LOW</strong> — only semantic / weak evidence<br>
+          • <strong>CONFLICT</strong> → escalate or disclose both
+        </div>
+      </div>
+    </div>
+
+    <div class="body" style="grid-template-columns: 1fr 1fr; padding-top: 8px;">
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-indigo">⚡</div>
+          <div>
+            <div class="pillar-title">Why Parallel Research</div>
+            <div class="pillar-tag">Latency + Evidence Breadth</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>Complete-before-respond</strong> — all sub-tasks resolved in the same turn before composing the answer</div></div>
+          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>Multi-source triangulation</strong> — graph + SQL + RAG hit simultaneously, not sequentially</div></div>
+          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>Sub-agents</strong> — specialist researchers per domain (compatibility, lifecycle, pricing) run in parallel</div></div>
+          <div class="item"><div class="item-dot dot-indigo"></div><div class="item-text"><strong>No early commitment</strong> — no anchoring on the first retrieved result</div></div>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-header">
+          <div class="pillar-icon icon-lime">🎯</div>
+          <div>
+            <div class="pillar-title">How Confidence Propagates</div>
+            <div class="pillar-tag">Scores → Tiers → Behavior</div>
+          </div>
+        </div>
+        <div class="pillar-items">
+          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Scores attach to evidence</strong> — every retrieved chunk, row, or edge carries a numeric score from its source</div></div>
+          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Consensus boosts tier</strong> — matching answers across surfaces promote HIGH; divergence demotes to LOW or CONFLICT</div></div>
+          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Tier drives phrasing</strong> — HIGH answers are stated plainly; MEDIUM hedge; LOW disclose uncertainty or escalate</div></div>
+          <div class="item"><div class="item-dot dot-lime"></div><div class="item-text"><strong>Transparent basis</strong> — agent can show whether claim came from declared (RDBMS) or inferred (graph) evidence</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-label">Parallel research · Scored evidence · Reconciled answer</div>
+      <div class="slide-counter">4 / 6</div>
+      <div class="footer-logo">Reshape</div>
+    </div>
+  </div>
+
+  <div class="slide" data-idx="5">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-block">
           <h1>Knowledge Construction System <span>(KCS)</span></h1>
           <p class="subtitle">Shifts knowledge assembly from query time to build time. Fixes the fragility problem (APIs break, rate-limits hit) and the representation problem (PDF chunks have no structure).</p>
         </div>
-        <div class="slide-tag">Slide 4 · Build-Time Knowledge Assembly</div>
+        <div class="slide-tag">Slide 5 · Build-Time Knowledge Assembly</div>
       </div>
     </div>
 
@@ -579,7 +669,7 @@
 
     <div class="footer">
       <div class="footer-label">Query-time → build-time</div>
-      <div class="slide-counter">4 / 5</div>
+      <div class="slide-counter">5 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
@@ -591,7 +681,7 @@
           <h1>Knowledge Layer <span>→ Tools</span></h1>
           <p class="subtitle">KCS produces three complementary query surfaces. Grounding layer consumes them through stable generated tools — never direct brand APIs at query time.</p>
         </div>
-        <div class="slide-tag">Slide 5 · Query Surfaces & Generated Tools</div>
+        <div class="slide-tag">Slide 6 · Query Surfaces & Generated Tools</div>
       </div>
     </div>
 
@@ -664,7 +754,7 @@
 
     <div class="footer">
       <div class="footer-label">Three surfaces · one agent</div>
-      <div class="slide-counter">5 / 5</div>
+      <div class="slide-counter">6 / 6</div>
       <div class="footer-logo">Reshape</div>
     </div>
   </div>
