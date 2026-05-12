@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCS — Knowledge Construction System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+<style>
+  :root {
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --gray: #374151;
+    --light: #e5e7eb;
+  }
+  .reveal { font-family: 'Segoe UI', system-ui, sans-serif; }
+  .reveal h1, .reveal h2, .reveal h3 { text-transform: none; letter-spacing: -0.02em; }
+  .reveal h1 { font-size: 2.2em; }
+  .reveal h2 { font-size: 1.5em; color: #a78bfa; }
+  .reveal h3 { font-size: 1.1em; color: #94a3b8; margin-bottom: 0.4em; }
+  .reveal pre code { font-size: 0.7em; max-height: 400px; }
+  .reveal section { padding: 0 40px; }
+
+  /* ── tag pills ── */
+  .tag { display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.55em;
+         font-weight:600; vertical-align:middle; letter-spacing:0.03em; }
+  .tag-done  { background:#065f46; color:#6ee7b7; }
+  .tag-wip   { background:#92400e; color:#fcd34d; }
+  .tag-later { background:#1e3a5f; color:#93c5fd; }
+
+  /* ── pipeline boxes ── */
+  .pipeline { display:flex; align-items:center; gap:6px; justify-content:center;
+              margin: 0.6em 0; flex-wrap: nowrap; }
+  .pbox { border-radius:10px; padding:10px 14px; text-align:center; flex:1; min-width:0;
+          font-size:0.58em; font-weight:600; line-height:1.3; }
+  .p1 { background:#2e1065; border:2px solid #7c3aed; color:#c4b5fd; }
+  .p2 { background:#0c4a6e; border:2px solid #0ea5e9; color:#7dd3fc; }
+  .p3 { background:#14532d; border:2px solid #16a34a; color:#86efac; }
+  .p4 { background:#7c2d12; border:2px solid #ea580c; color:#fdba74; }
+  .parrow { color:#6b7280; font-size:1.2em; flex-shrink:0; }
+
+  /* ── two-col layout ── */
+  .cols2 { display:grid; grid-template-columns:1fr 1fr; gap:1.4em; align-items:start; }
+  .cols3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1em; align-items:start; }
+
+  /* ── card ── */
+  .card { background:#1e293b; border-radius:10px; padding:14px 16px;
+          border:1px solid #334155; font-size:0.58em; }
+  .card h4 { margin:0 0 8px; font-size:1.2em; color:#f1f5f9; }
+  .card ul { margin:0; padding-left:1.2em; color:#94a3b8; line-height:1.7; }
+  .card-accent { border-color: var(--accent); }
+  .card-cyan   { border-color: var(--accent2); }
+  .card-green  { border-color: var(--green); }
+  .card-yellow { border-color: var(--yellow); }
+
+  /* ── km diagram ── */
+  .km-tree { font-size:0.52em; background:#0f172a; border-radius:10px;
+             padding:10px 14px; text-align:left; font-family:monospace;
+             color:#94a3b8; line-height:1.5; border:1px solid #1e3a5f;
+             white-space: pre; }
+  .km-key  { color:#7dd3fc; }
+  .km-type { color:#86efac; }
+  .km-note { color:#6b7280; }
+
+  /* ── memory layers ── */
+  .mem-layer { border-radius:8px; padding:10px 16px; margin:6px 0;
+               display:flex; justify-content:space-between; align-items:center;
+               font-size:0.6em; }
+  .mem-l1 { background:#1e1b4b; border:1px solid #4338ca; }
+  .mem-l2 { background:#1e293b; border:1px solid #0ea5e9; }
+  .mem-l3 { background:#0f2d1e; border:1px solid #16a34a; }
+  .mem-l4 { background:#2d1b00; border:1px solid #d97706; }
+  .mem-label { font-weight:700; color:#f1f5f9; }
+  .mem-sub   { color:#94a3b8; }
+  .mem-tech  { font-style:italic; color:#64748b; }
+
+  /* ── status table ── */
+  .stbl { width:100%; border-collapse:collapse; font-size:0.58em; }
+  .stbl th { background:#1e293b; color:#94a3b8; padding:6px 10px; text-align:left;
+             font-weight:600; border-bottom:1px solid #334155; }
+  .stbl td { padding:6px 10px; border-bottom:1px solid #1e293b; color:#e2e8f0; }
+  .stbl tr:last-child td { border-bottom:none; }
+
+  /* ── infra boxes ── */
+  .infra-row { display:flex; gap:10px; justify-content:center; margin:0.4em 0; }
+  .ibox { background:#1e293b; border-radius:8px; padding:10px 14px; text-align:center;
+          font-size:0.55em; border:1px solid #334155; flex:1; }
+  .ibox strong { display:block; color:#f1f5f9; font-size:1.2em; margin-bottom:4px; }
+  .ibox span   { color:#94a3b8; }
+  .ibox.accent { border-color:var(--accent); }
+  .ibox.cyan   { border-color:var(--accent2); }
+  .ibox.green  { border-color:var(--green); }
+
+  /* ── challenge cards ── */
+  .chal { background:#1e293b; border-radius:8px; padding:7px 14px; font-size:0.52em;
+          border-left:3px solid var(--yellow); margin:4px 0; }
+  .chal strong { color:#fcd34d; }
+  .chal p { margin:4px 0 0; color:#94a3b8; }
+
+  /* ── subtitle/label ── */
+  .lbl { font-size:0.55em; color:#64748b; font-weight:600; letter-spacing:0.08em;
+         text-transform:uppercase; margin-bottom:4px; }
+
+  /* ── title slide ── */
+  .title-kicker { color:#7c3aed; font-weight:700; font-size:0.6em;
+                  letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.3em; }
+  .title-sub    { color:#94a3b8; font-size:0.7em; margin-top:0.4em; }
+  .title-meta   { color:#4b5563; font-size:0.45em; margin-top:1.2em; }
+
+  /* ── flow arrows ── */
+  .flow { display:flex; flex-direction:column; gap:4px; align-items:center;
+          font-size:0.58em; }
+  .flow-box { background:#1e293b; border:1px solid #334155; border-radius:6px;
+              padding:7px 20px; color:#e2e8f0; width:100%; text-align:center; }
+  .flow-arr { color:#4b5563; }
+
+  /* ── hitl ── */
+  .hitl-states { display:flex; align-items:center; gap:6px; justify-content:center;
+                 font-size:0.55em; flex-wrap:wrap; margin:0.8em 0; }
+  .hs { background:#1e293b; border:1px solid #334155; border-radius:6px;
+        padding:6px 12px; color:#e2e8f0; }
+  .hs.active { background:#1e1b4b; border-color:#7c3aed; color:#c4b5fd; }
+  .ha { color:#4b5563; }
+
+  /* ── learning loop ── */
+  .learn-row { display:flex; align-items:center; gap:0; margin:0.4em 0; }
+  .learn-box { flex:1; background:#1e293b; border-radius:8px; padding:8px 12px;
+               font-size:0.48em; text-align:center; border:1px solid #334155; }
+  .learn-box strong { display:block; font-size:1.2em; color:#f1f5f9; margin-bottom:2px; }
+  .learn-box span { color:#64748b; }
+  .learn-arrow { color:#4b5563; font-size:0.9em; flex-shrink:0; padding:0 4px; }
+
+  /* ── graph memory tiers ── */
+  .gmem { border-radius:10px; padding:10px 16px; margin:5px 0;
+          font-size:0.52em; display:grid; grid-template-columns:1fr 2fr 1fr;
+          gap:10px; align-items:center; }
+  .gmem-l1 { background:#1e1b4b; border:1px solid #4338ca; }
+  .gmem-l2 { background:#0f2d1e; border:1px solid #16a34a; }
+  .gmem-l3 { background:#2d1b00; border:1px solid #d97706; }
+  .gmem-title { font-weight:700; color:#f1f5f9; }
+  .gmem-items { color:#94a3b8; line-height:1.5; }
+  .gmem-tech { font-style:italic; color:#64748b; text-align:right; font-size:0.9em; }
+
+  /* code inline */
+  code { background:#1e293b; padding:1px 6px; border-radius:4px;
+         font-size:0.85em; color:#7dd3fc; }
+
+  .fragment.highlight-current-blue.current-fragment { color: #7dd3fc; }
+
+  .slide-number { color: #4b5563 !important; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 1 — TITLE
+═══════════════════════════════════════════════════════════ -->
+<section data-background-gradient="radial-gradient(ellipse at 30% 40%, #1e1b4b 0%, #0f172a 60%)">
+  <div class="title-kicker">AI R&D · Internal Engineering</div>
+  <h1 style="font-size:2.6em; font-weight:800; background:linear-gradient(135deg,#a78bfa,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+    Knowledge Construction System
+  </h1>
+  <div class="title-sub">
+    An agentic pipeline that builds structured, provenance-tracked brand knowledge —<br>
+    so agents reason from what they've learned, not from live search at query time.
+  </div>
+  <div class="title-meta">
+    V1 · Festo PoC · May 2026
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>The Problem</h2>
+  <div class="cols3" style="margin-top:0.6em;">
+    <div class="card card-accent">
+      <h4>⚡ Fragility</h4>
+      <ul>
+        <li>Live source calls at query time</li>
+        <li>APIs rate-limit, change, go down</li>
+        <li>PDFs parse inconsistently</li>
+        <li>One outage → degraded product</li>
+      </ul>
+    </div>
+    <div class="card card-cyan">
+      <h4>🕸 No Structure</h4>
+      <ul>
+        <li>Chunk-level RAG has no traversal</li>
+        <li>Can't answer: <em>motor → VFD → compatible PLC → PLC is EOL → replacement?</em></li>
+        <li>Relationships live in PDFs, not queryable</li>
+      </ul>
+    </div>
+    <div class="card card-yellow">
+      <h4>🔁 No Learning</h4>
+      <ul>
+        <li>Every query re-discovers the same facts</li>
+        <li>No memory of what worked or failed before</li>
+        <li>Each new brand starts completely from zero</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top:0.8em; background:#1e293b; border-radius:10px; padding:12px 20px; font-size:0.6em; border-left:3px solid #7c3aed;">
+    <strong style="color:#a78bfa;">Thesis:</strong>
+    <span style="color:#cbd5e1;"> Shift knowledge assembly from <strong style="color:#f1f5f9;">query time</strong> to <strong style="color:#f1f5f9;">build time</strong>. KCS pre-constructs structured, provenance-tracked artifacts that improve with every iteration.</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 3 — SYSTEM CONTEXT
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>System Context</h2>
+  <div style="margin-top:0.1em;">
+    <!-- Sources row -->
+    <div class="infra-row" style="margin:0.1em 0;">
+      <div class="ibox" style="padding:5px 12px;"><strong>📄 Documents</strong><span>PDFs · Specs · Manuals · Data sheets</span></div>
+      <div class="ibox" style="padding:5px 12px;"><strong>🌐 Web</strong><span>Brand sites · Blogs · Knowledge bases</span></div>
+      <div class="ibox" style="padding:5px 12px;"><strong>🔌 APIs &amp; Portals</strong><span>REST · GraphQL · Feeds</span></div>
+    </div>
+    <!-- Arrow down -->
+    <div style="text-align:center; font-size:1em; color:#4b5563; margin:0;">↓</div>
+    <!-- KCS block -->
+    <div style="background:linear-gradient(135deg,#1e1b4b,#0c4a6e); border:2px solid #7c3aed; border-radius:12px; padding:6px 20px; text-align:center; font-size:0.7em; font-weight:700; color:#e2e8f0; margin:0 60px;">
+      🧠 &nbsp; <span style="color:#a78bfa;">Knowledge Construction System</span><br>
+      <span style="font-size:0.75em; font-weight:400; color:#64748b;">Ingest · Model · Resolve · Review · Write · Learn</span>
+    </div>
+    <!-- FDE label -->
+    <div style="text-align:right; font-size:0.5em; color:#64748b; margin-right:60px; margin-top:-4px;">
+      ↔ FDE (HITL review)
+    </div>
+    <!-- Arrow down -->
+    <div style="text-align:center; font-size:1em; color:#4b5563; margin:0;">↓</div>
+    <!-- Knowledge Layer -->
+    <div class="infra-row" style="margin:0.1em 0;">
+      <div class="ibox cyan" style="padding:5px 12px;"><strong>🗂 Knowledge Graph</strong><span>Neo4j · per-brand</span></div>
+      <div class="ibox green" style="padding:5px 12px;"><strong>📐 Generated Tools</strong><span>graph_search · get_taxonomy · check_compatibility</span></div>
+    </div>
+    <!-- Arrow down -->
+    <div style="text-align:center; font-size:1em; color:#4b5563; margin:0;">↓</div>
+    <!-- Grounding Layer -->
+    <div style="background:#0f2d1e; border:2px solid #16a34a; border-radius:10px; padding:6px 20px; text-align:center; font-size:0.65em; font-weight:700; color:#86efac; margin:0 80px;">
+      ⚡ Grounding Layer &nbsp;—&nbsp; <span style="color:#64748b; font-weight:400;">agents reason from pre-built knowledge, not live search</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 4 — THE FOUR-AGENT PIPELINE
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>The Four-Agent Pipeline</h2>
+  <div class="pipeline" style="margin-top:0.8em;">
+    <div class="pbox p1">
+      🔍<br><strong>Source Discovery</strong><br><span style="color:#a78bfa; font-weight:400;">explores all sources</span><br>→ KnowledgeMap
+    </div>
+    <div class="parrow">▶</div>
+    <div class="pbox p2">
+      🗺<br><strong>Knowledge Cartographer</strong><br><span style="color:#7dd3fc; font-weight:400;">samples &amp; extracts</span><br>→ EntityVocabulary
+    </div>
+    <div class="parrow">▶</div>
+    <div class="pbox p3">
+      📐<br><strong>Schema Modeling</strong><br><span style="color:#86efac; font-weight:400;">infers graph schema</span><br>→ Proposal (HITL)
+    </div>
+    <div class="parrow">▶</div>
+    <div class="pbox p4">
+      📦<br><strong>Entity Harvesting</strong><br><span style="color:#fdba74; font-weight:400;">full paginated harvest</span><br>→ Graph via GCH
+    </div>
+  </div>
+  <div style="margin-top:0.9em; display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.58em;">
+    <div style="background:#1e293b; border-radius:8px; padding:10px 14px; border-left:3px solid #7c3aed;">
+      <strong style="color:#a78bfa;">Orchestrator</strong><br>
+      <span style="color:#94a3b8;">Lean coordinator — passes <code>brand_id</code> + <code>run_id</code> + store keys; each agent reads upstream artifacts from the knowledge store, never from message history.</span>
+    </div>
+    <div style="background:#1e293b; border-radius:8px; padding:10px 14px; border-left:3px solid #0ea5e9;">
+      <strong style="color:#7dd3fc;">Iterative by design</strong><br>
+      <span style="color:#94a3b8;">Every run enriches the previous KnowledgeMap. Run 1 surveys the surface. Run N validates, corrects and discovers deeper relationships using hints from prior runs.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 5 — SOURCE DISCOVERY AGENT
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Agent 1 · Source Discovery</h2>
+  <div class="cols2">
+    <div>
+      <div class="lbl">Two modes</div>
+      <div class="flow">
+        <div class="flow-box" style="border-color:#7c3aed; color:#c4b5fd;"><strong>Cold start</strong> — load_knowledge_map → null<br><span style="font-size:0.9em; color:#64748b;">probe from human seed</span></div>
+        <div class="flow-arr">↕</div>
+        <div class="flow-box" style="border-color:#0ea5e9; color:#7dd3fc;"><strong>Enrichment</strong> — load prior KM<br><span style="font-size:0.9em; color:#64748b;">follow next_run_hints, go deeper</span></div>
+      </div>
+      <div class="lbl" style="margin-top:0.8em;">Human seed (optional)</div>
+      <div style="font-size:0.52em; color:#94a3b8; line-height:1.6;">
+        • Brand name only → web search + brand site crawl<br>
+        • Portal URL → crawl + JS analysis<br>
+        • Document path → <code>read_reference_doc()</code><br>
+        • Nothing → cold probe from known patterns
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Tool suite</div>
+      <div style="font-size:0.52em; color:#94a3b8; background:#0f172a; border-radius:8px; padding:10px 14px; line-height:1.6; font-family:monospace;">
+        <span style="color:#7dd3fc;">load_knowledge_map</span> / <span style="color:#7dd3fc;">save_knowledge_map</span><br>
+        <span style="color:#86efac;">call_endpoint</span> &nbsp;&nbsp;← HTTP sandbox (SSRF-safe)<br>
+        <span style="color:#86efac;">fetch_openapi_spec</span><br>
+        <span style="color:#86efac;">probe_rest_conventions</span><br>
+        <span style="color:#fcd34d;">search_engine_batch</span> &nbsp;← web search<br>
+        <span style="color:#fcd34d;">extract_with_jina</span> / <span style="color:#fcd34d;">extract_with_firecrawl</span><br>
+        <span style="color:#fcd34d;">scrape_as_markdown</span> / <span style="color:#fcd34d;">analyze_js_bundle</span><br>
+        <span style="color:#f9a8d4;">read_reference_doc</span> &nbsp;&nbsp;← PDFs, specs, manuals
+      </div>
+      <div style="margin-top:6px; font-size:0.46em; color:#64748b; line-height:1.5;">
+        <code>@_safe_tool</code> returns error JSON on exception ·
+        <code>ToolRetryMiddleware</code> retries on httpx timeouts/network errors
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 6 — KNOWLEDGEMAP
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>The KnowledgeMap</h2>
+  <div class="lbl">The pipeline's north star — built incrementally by Source Discovery</div>
+  <div class="cols2" style="margin-top:0.4em; align-items:start;">
+    <div class="km-tree">
+<span class="km-key">KnowledgeMap</span>  <span class="km-note">brand_id · schema_version</span>
+<span class="km-key">backends[]</span>  <span class="km-note">id · base_url · purpose · auth{}</span>
+<span class="km-key">endpoints[]</span>
+  <span class="km-key"> path · method · status · discovered_via</span>
+  <span class="km-key"> params{}</span>  <span class="km-note">type · required · example</span>
+  <span class="km-key"> response_schema_ref</span>
+<span class="km-key">entity_schemas{}</span>  <span class="km-note">API-layer shapes</span>
+  <span class="km-key"> fields[]</span>  <span class="km-note">name · type · nullable</span>
+  <span class="km-key"> confidence</span>  <span class="km-note">0.0–1.0</span>  <span class="km-key">· sample</span>
+<span class="km-key">id_flows[]</span>  <span class="km-note">cross-endpoint deps</span>
+<span class="km-key">pagination_contracts[]</span>
+<span class="km-key">discovery_meta</span>
+  <span class="km-key"> narrative</span>  <span class="km-note">prose for humans</span>
+  <span class="km-key"> gaps[]  · next_run_hints[]</span>
+    </div>
+    <div>
+      <div class="card" style="font-size:0.50em; padding:10px 14px; margin-bottom:8px;">
+        <h4>🔄 Enrichment loop</h4>
+        <ul>
+          <li><strong>Run 1</strong>: probe all endpoints, capture entity shapes</li>
+          <li><strong>Run 2</strong>: walk category tree using Run 1 IDs</li>
+          <li><strong>Run N</strong>: validate fields, discover hints from hrefs</li>
+        </ul>
+      </div>
+      <div class="card card-cyan" style="font-size:0.50em; padding:10px 14px;">
+        <h4>📌 Store</h4>
+        <ul>
+          <li>Knowledge store key: <code>kcs:&lt;brand&gt;:discovery:knowledge_map</code></li>
+          <li>30-day TTL · JSON · Pydantic-validated on write</li>
+          <li>Typed tool param → LLM gets correct field names</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 7 — CARTOGRAPHER + SCHEMA
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Agents 2 &amp; 3 · Cartographer + Schema Modeling</h2>
+  <div class="cols2" style="margin-top:0.3em;">
+    <div>
+      <div class="lbl">Knowledge Cartographer</div>
+      <div class="card card-cyan" style="font-size:0.50em; padding:10px 14px; margin-bottom:6px;">
+        <h4>🗺 Samples → EntityVocabulary</h4>
+        <ul>
+          <li>Reads KnowledgeMap, calls 1–2 pages per endpoint</li>
+          <li>Raw responses → scratchpad (per <code>run_id</code>)</li>
+          <li><code>summarize_vocabulary</code> → compact EntityVocabulary</li>
+          <li>7-day warm cache — skips re-sampling on hit</li>
+        </ul>
+      </div>
+      <div style="font-size:0.46em; color:#64748b; font-style:italic;">
+        Entity types = catalog things (Series, Article, Category).<br>
+        REST plumbing (Job, Session, HealthStatus) is dropped.
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Schema Modeling Agent</div>
+      <div class="card card-green" style="font-size:0.50em; padding:10px 14px; margin-bottom:6px;">
+        <h4>📐 EntityVocabulary → Proposal</h4>
+        <ul>
+          <li>Reads EntityVocabulary + prior schema decisions</li>
+          <li>Infers <code>NodeDefinition</code> / <code>EdgeDefinition</code> — not hardcoded</li>
+          <li>Submits typed <strong>SCHEMA Proposal</strong> for HITL review</li>
+        </ul>
+      </div>
+      <div style="font-size:0.46em; color:#94a3b8; background:#0f172a; border-radius:6px; padding:8px 12px; font-family:monospace; line-height:1.5;">
+        <span style="color:#86efac;">NodeDefinition</span>(<br>
+        &nbsp; label=<span style="color:#fcd34d;">"ProductFamily"</span>,<br>
+        &nbsp; properties=[<span style="color:#fcd34d;">"partNumber"</span>, <span style="color:#fcd34d;">"series"</span>],<br>
+        &nbsp; source_evidence=[<span style="color:#fcd34d;">"endpoint:catalog.products"</span>]<br>
+        )
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 8 — HITL + GCH
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>HITL Review &amp; Graph Construction Harness</h2>
+  <div class="cols2">
+    <div>
+      <div class="lbl">Proposal lifecycle</div>
+      <div class="hitl-states">
+        <div class="hs">Proposed</div>
+        <div class="ha">→</div>
+        <div class="hs active">UnderReview</div>
+        <div class="ha">→</div>
+        <div class="hs">Accepted</div>
+        <div class="ha">→</div>
+        <div class="hs" style="border-color:#16a34a; background:#0f2d1e; color:#86efac;">Published</div>
+      </div>
+      <div style="font-size:0.52em; color:#94a3b8; margin-top:6px; line-height:1.8;">
+        Three mandatory checkpoints:<br>
+        1. New / changed <strong style="color:#e2e8f0;">schema</strong> (node/edge/table definitions)<br>
+        2. Activation of <strong style="color:#e2e8f0;">inferred rules</strong> surfacing in tools<br>
+        3. <strong style="color:#e2e8f0;">Conflict</strong> where no precedence rule applies
+      </div>
+      <div style="margin-top:10px; font-size:0.52em; background:#1e293b; border-radius:8px; padding:10px 12px; border-left:3px solid #7c3aed;">
+        <strong style="color:#a78bfa;">Review surfaces:</strong><br>
+        <span style="color:#94a3b8;">• CLI <code>scripts/kcs_proposals.py</code> — Phase 1 scaffold<br>
+        • MCP Server (Phase 2) — FDE approves inside claude.ai via <strong>MCP elicitation</strong></span>
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Graph Construction Harness</div>
+      <div class="flow" style="font-size:0.58em; gap:3px;">
+        <div class="flow-box">Agent generates parameterized Cypher</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#7c3aed;">GCH AST security parser<br><span style="font-size:0.85em; color:#64748b;">blocks DROP, LOAD CSV, apoc.cypher.doIt</span></div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box">Provenance auto-injected<br><span style="font-size:0.85em; color:#64748b;">brand_id · run_id · ingested_at · confidence</span></div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#f59e0b; color:#fcd34d;">HITL queue → FDE approves</div>
+        <div class="flow-arr">↓</div>
+        <div class="flow-box" style="border-color:#16a34a; color:#86efac;">Write to Neo4j brand database</div>
+      </div>
+      <div style="font-size:0.5em; color:#64748b; margin-top:6px;">
+        External agents use <code>GraphQueryClient</code> — writes blocked at parser level.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 9 — HOW KCS LEARNS
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>How KCS Learns</h2>
+  <div style="font-size:0.45em; color:#64748b; margin-bottom:0.1em;"><strong style="color:#a78bfa;">Brand-level</strong> learning (per brand) &nbsp;+&nbsp; <strong style="color:#7dd3fc;">ALTM</strong> meta-level learning (how to learn across brands)</div>
+  <div class="cols2" style="margin-top:0.05em;">
+    <div>
+      <div class="card card-accent" style="font-size:0.44em; padding:6px 12px; margin-bottom:4px;">
+        <h4>🔄 Run-over-run enrichment</h4>
+        <ul>
+          <li>Each run loads the previous KnowledgeMap + <code>next_run_hints</code></li>
+          <li>Run 1 surveys the surface; Run 2 follows up on gaps; Run N validates</li>
+          <li>Failed probes are remembered — bad patterns skipped next time</li>
+          <li>Pagination strategies, auth patterns, cursor formats — learned once, reused forever</li>
+        </ul>
+      </div>
+      <div class="card card-cyan" style="font-size:0.44em; padding:6px 12px;">
+        <h4>🧭 Meta-level learning (ALTM)</h4>
+        <ul>
+          <li>Learns <em>how to learn</em> — auth patterns, endpoint discovery, pagination strategies reused across brands</li>
+          <li>Similar taxonomies → seed schema hypothesis: "Festo's product hierarchy fits Siemens too"</li>
+          <li>Semantic retrieval of brand-agnostic knowledge to bootstrap a new brand faster</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card card-green" style="font-size:0.44em; padding:6px 12px; margin-bottom:4px;">
+        <h4>📊 Confidence-weighted knowledge</h4>
+        <ul>
+          <li>Every fact starts low-confidence (<code>0.3</code>)</li>
+          <li>Validated across multiple runs &amp; sources → confidence rises</li>
+          <li>Contradictions from new data → flagged for HITL resolution</li>
+          <li>Old facts that can't be re-confirmed → decay; HITL decides</li>
+        </ul>
+      </div>
+      <div class="card card-yellow" style="font-size:0.44em; padding:6px 12px;">
+        <h4>🔧 Schema evolution via graph</h4>
+        <ul>
+          <li>Run 1: <code>ProductFamily</code> modeled as flat list</li>
+          <li>Run 3: discovers it's actually hierarchical</li>
+          <li>Graph correction: rename + add <code>-[HAS_PARENT]→</code> — no migration scripts</li>
+          <li>Relational DB would require ALTER TABLE + data migration</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 10 — GRAPH AS KNOWLEDGE MEMORY
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>The Knowledge Graph as Agent Memory</h2>
+  <div style="font-size:0.48em; color:#64748b; margin-bottom:0.3em;">Inspired by Neo4j Agent Memory — three tiers, one unified graph</div>
+  <div class="gmem gmem-l1" style="margin-top:0.3em;">
+    <div class="gmem-title">💬 Short-term</div>
+    <div class="gmem-items">LangGraph message state · current run context · scratchpad (per <code>run_id</code>)</div>
+    <div class="gmem-tech">in-process · discarded after run</div>
+  </div>
+  <div class="gmem gmem-l2">
+    <div class="gmem-title">🧠 Long-term<br><span style="color:#86efac; font-weight:400;">brand knowledge</span></div>
+    <div class="gmem-items">Entities · Relationships · Confidence scores · Provenance chains · Schema decisions · Cypher templates</div>
+    <div class="gmem-tech">Neo4j graph DB<br>per-brand database</div>
+  </div>
+  <div class="gmem gmem-l3">
+    <div class="gmem-title">🌐 Global<br><span style="color:#fcd34d; font-weight:400;">cross-brand</span></div>
+    <div class="gmem-items">Patterns from all brands · "What schema worked for similar APIs?" · Reasoning traces · Tool call records</div>
+    <div class="gmem-tech">Bedrock AgentCore<br>Memory / graph</div>
+  </div>
+  <div style="margin-top:0.5em; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:0.46em;">
+    <div style="background:#1e293b; border-radius:8px; padding:8px 10px; border-top:2px solid #16a34a;">
+      <strong style="color:#86efac;">Cypher + semantic search</strong><br>
+      <span style="color:#64748b;">Structural queries AND vector similarity in the same store — no join between two systems</span>
+    </div>
+    <div style="background:#1e293b; border-radius:8px; padding:8px 10px; border-top:2px solid #7c3aed;">
+      <strong style="color:#c4b5fd;">Schema-flexible</strong><br>
+      <span style="color:#64748b;">Add <code>-[HAS_VARIANT]→</code> without ALTER TABLE. New relationship types cost nothing.</span>
+    </div>
+    <div style="background:#1e293b; border-radius:8px; padding:8px 10px; border-top:2px solid #f59e0b;">
+      <strong style="color:#fcd34d;">Graph traversal</strong><br>
+      <span style="color:#64748b;">Agents can ask: find all Series with motorType=servo across any catalog depth</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 11 — MEMORY ARCHITECTURE
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Memory Architecture</h2>
+  <div style="font-size:0.55em; color:#64748b; margin-bottom:0.3em;">Layered model — short-term tiers are per-run; long-term stores are brand-scoped or global.</div>
+
+  <div class="mem-layer mem-l1">
+    <div><span class="mem-label">💬 Conversational Memory</span><br><span class="mem-sub">LangGraph message state — current run only</span></div>
+    <span class="mem-tech">in-process</span>
+  </div>
+  <div class="mem-layer mem-l2">
+    <div><span class="mem-label">📝 Scratchpad</span><br><span class="mem-sub">Per <code>run_id</code> — raw source pages, entity batches, pagination cursors</span></div>
+    <span class="mem-tech">ephemeral store · /tmp · discarded after run</span>
+  </div>
+  <div class="mem-layer mem-l3">
+    <div><span class="mem-label">🧠 BLTM — Brand Long-Term Memory</span><br><span class="mem-sub">knowledge_map · entity_vocabulary · schema decisions · Cypher templates</span></div>
+    <span class="mem-tech">knowledge store · TTL-based · per-brand</span>
+  </div>
+  <div class="mem-layer mem-l4">
+    <div><span class="mem-label">🌐 AGLM — Agent Global Long-Term Memory</span><br><span class="mem-sub">Cross-brand patterns promoted via HITL · "what schema worked for a similar brand?"</span></div>
+    <span class="mem-tech">Bedrock AgentCore Memory (V2+)</span>
+  </div>
+
+  <div style="margin-top:0.4em; font-size:0.46em; color:#4b5563; text-align:center;">
+    Each agent can read other agents' BLTM within the same brand · AGLM is read-only, gated by HITL promotion
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 12 — TECH STACK + INFRASTRUCTURE
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Tech Stack &amp; Infrastructure</h2>
+  <div class="cols3" style="margin-top:0.3em;">
+    <div>
+      <div class="lbl">Agents &amp; Runtime</div>
+      <div class="card card-accent" style="font-size:0.50em; padding:10px 14px;">
+        <ul>
+          <li><strong>deepagents</strong> — LangGraph agent harness</li>
+          <li><strong>LangChain</strong> — tools, callbacks, structured output</li>
+          <li><strong>Claude Sonnet 4.6</strong> — primary LLM</li>
+          <li><strong>LangSmith Studio</strong> — dev UI + traces</li>
+          <li><strong>Langfuse</strong> — production evals</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Storage</div>
+      <div class="card card-cyan" style="font-size:0.50em; padding:10px 14px;">
+        <ul>
+          <li><strong>Neo4j 5.24</strong> — brand knowledge graph</li>
+          <li><strong>Knowledge store</strong> — BLTM (KM, vocab, decisions)</li>
+          <li><strong>Ephemeral store</strong> — per-run scratchpad</li>
+          <li><strong>Bedrock AgentCore Memory</strong> — AGLM (V2+)</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Local Dev / CI</div>
+      <div class="card card-green" style="font-size:0.50em; padding:10px 14px;">
+        <ul>
+          <li><strong>Dev Container</strong> — one-click setup</li>
+          <li><strong>Docker Compose</strong> — Neo4j + stores</li>
+          <li><strong>uv workspace</strong> — monorepo deps</li>
+          <li><strong>GitHub Actions</strong> — CI (lint, test)</li>
+          <li><strong>FastAPI</strong> — proposal API</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:0.4em; font-size:0.46em; background:#1e293b; border-radius:8px; padding:6px 16px; display:flex; gap:20px; justify-content:center; color:#64748b;">
+    <span>🐍 Python 3.12+</span>
+    <span>📦 uv workspace</span>
+    <span>🔍 Ruff lint+format</span>
+    <span>✅ pytest</span>
+    <span>🎯 Makefile shortcuts</span>
+    <span>⚡ ECS Express (prod path)</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 13 — IMPLEMENTATION STATUS
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Implementation Status</h2>
+  <table class="stbl" style="margin-top:0.4em;">
+    <thead>
+      <tr><th>Component</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>uv workspace · Dev container · Docker Compose</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td>Shared Pydantic models · Neo4j + store async clients</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td>Graph Construction Harness (GCH) · Cypher validator · HITL store</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td>LangSmith tracing · Langfuse tracing · langgraph.json (Studio)</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td><strong>Source Discovery Agent</strong> — full tool suite + KnowledgeMap</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td>4 deep agents as <code>CompiledSubAgent</code> · Orchestrator wiring</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td><strong>Knowledge Cartographer</strong> — real sampling + EntityVocabulary</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td><strong>Schema Modeling</strong> — LLM-backed reasoning + prior decisions</td><td><span class="tag tag-done">✓ done</span></td></tr>
+      <tr><td><strong>Entity Harvesting</strong> — paginator + GCH write path</td><td><span class="tag tag-wip">⚙ in progress</span></td></tr>
+      <tr><td>Proposal API (FastAPI accept/reject) · MCP server for HITL</td><td><span class="tag tag-later">Phase 2</span></td></tr>
+      <tr><td>ALTM — meta-level learning · Bedrock AgentCore Memory</td><td><span class="tag tag-later">Phase 3+</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 14 — OPEN CHALLENGES
+═══════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Open Infrastructure Challenges</h2>
+  <div style="margin-top:0.2em;">
+    <div class="chal">
+      <strong>🧠 Long-term memory at scale — Bedrock AgentCore Memory</strong>
+      <p>V1 uses a simple TTL-based knowledge store. V2 needs managed, semantically-searchable agent memory: <strong>Amazon Bedrock AgentCore Memory</strong> offers this as a managed service — no Redis ops, native IAM, built for agent workflows. Swap point: <code>get_store()</code> initializer only, no agent code changes.</p>
+    </div>
+    <div class="chal">
+      <strong>🌐 AGLM — graph vs. managed memory</strong>
+      <p>V1 global memory is exact-key lookup. V2 needs semantic retrieval: "what schema patterns worked for similar brands?" We're evaluating Neo4j's agent memory layer (hybrid graph + vector) vs <strong>Bedrock AgentCore Memory</strong> (managed, AWS-native). Both support the three-tier model from Neo4j's research.</p>
+    </div>
+    <div class="chal">
+      <strong>🔄 Data freshness / incremental sync</strong>
+      <p>Strategy depends on whether the brand exposes a <code>modified_since</code> / changelog endpoint. Unresolved: full re-harvest vs. delta from cursor. Confidence decay triggers re-validation before staleness becomes a problem.</p>
+    </div>
+    <div class="chal">
+      <strong>📚 Non-API knowledge sources at scale</strong>
+      <p>PDFs, spec sheets, image-based catalogs require different extraction strategies than REST APIs. Extraction pipeline: statistical NER → zero-shot NER → LLM fallback → merge &amp; deduplicate (similar to Neo4j's entity extraction research).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 15 — DISCUSSION
+═══════════════════════════════════════════════════════════ -->
+<section data-background-gradient="radial-gradient(ellipse at 70% 60%, #0c4a6e 0%, #0f172a 60%)">
+  <h2 style="color:#7dd3fc;">Discussion &amp; Validation</h2>
+  <div class="cols2" style="margin-top:0.4em;">
+    <div>
+      <div class="lbl">Questions for the team</div>
+      <div class="card card-cyan" style="font-size:0.50em; padding:10px 14px;">
+        <ul>
+          <li>Does the <strong>4-agent split</strong> make sense, or should Discovery + Cartographer merge?</li>
+          <li>Is <strong>Neo4j per-brand database</strong> the right isolation, or single db + brand labels?</li>
+          <li>HITL through <strong>MCP elicitation in claude.ai</strong> — right FDE UX?</li>
+          <li><strong>Bedrock AgentCore Memory vs. Neo4j</strong> for AGLM?</li>
+          <li>Sync trigger: <strong>webhook vs. scheduled enrichment run</strong>?</li>
+          <li>How do we handle <strong>schema contradictions</strong> across document + API sources?</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="lbl">V1 success criteria</div>
+      <div class="card card-green" style="font-size:0.50em; padding:10px 14px;">
+        <ul>
+          <li>End-to-end pipeline → <strong>valid, queryable Festo knowledge graph</strong></li>
+          <li>Grounding layer uses only <strong>generated tools</strong> — zero live source calls</li>
+          <li>Second run <strong>demonstrably richer</strong> than first</li>
+          <li>FDE can <strong>accept/reject proposals</strong> in ≤ 5 min</li>
+          <li>Every fact <strong>traceable to its source</strong></li>
+          <li><strong>Confidence scores</strong> move up across iterations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:0.4em; font-size:0.46em; color:#4b5563; text-align:center;">
+    Repo: experiment-knowledge-construction-system &nbsp;·&nbsp; Spec: srs-kcs.md
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'slide',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    controls: true,
+    progress: true,
+    center: false,
+    width: 1200,
+    height: 700,
+    margin: 0.04,
+    plugins: []
+  });
+</script>
+</body>
+</html>
